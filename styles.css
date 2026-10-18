@@ -258,3 +258,17 @@ main { flex: 1; width: 100%; max-width: 1510px; margin: 0 auto; padding: 37px 42
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+
+/* Cultural Bridge workspace */
+.cultural-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 17px; }
+.cultural-control { margin: 7px 0 14px; }
+.cultural-label { margin-top: 2px; }
+.cultural-copy { margin-top: 12px; }
+.cultural-phrase-button { width: 100%; margin: 3px 0 13px; }
+#bridge-result:empty { display: none; }
+#bridge-phrase-result { min-height: 72px; }
+@media (max-width: 760px) {
+  .cultural-grid { grid-template-columns: minmax(0, 1fr); gap: 13px; }
+  .cultural-control { margin-bottom: 12px; }
+  .cultural-copy { width: 100%; }
+}
