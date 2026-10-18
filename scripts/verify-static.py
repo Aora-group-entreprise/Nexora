@@ -84,6 +84,16 @@ def main():
 
     app_js = ROOT / "app.js"
     styles_css = ROOT / "styles.css"
+    browser_test = ROOT / "tests" / "browser-smoke.cjs"
+    workflow = ROOT / ".github" / "workflows" / "static-checks.yml"
+    if not browser_test.is_file():
+        errors.append("Playwright browser smoke test file is missing")
+    if workflow.is_file():
+        workflow_text = workflow.read_text(encoding="utf-8")
+        for feature in ("npm install --no-save playwright", "playwright install --with-deps chromium", "node tests/browser-smoke.cjs"):
+            if feature not in workflow_text:
+                errors.append("browser test workflow step missing: " + feature)
+
     if not app_js.is_file():
         errors.append("app.js is missing")
     required_content_controls = {
@@ -174,6 +184,7 @@ def main():
     print(f"PASS: {len(required_identity_controls)} Digital Identity controls are present")
     print("PASS: local profile editor, HTTPS link validation, preview, JSON import/export and copy hooks are present")
     print("PASS: browser-history navigation, safe external links, profile length limits and truthful reset errors are guarded")
+    print("PASS: Playwright browser smoke tests are present and wired into GitHub Actions")
     print("PASS: local asset paths and CSS brace counts are valid")
     return 0
 
