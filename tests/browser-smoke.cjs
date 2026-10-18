@@ -94,7 +94,7 @@ async function main() {
     await page.locator("#mobile-menu-button").click();
     assert.equal(await page.locator("#sidebar").evaluate((node) => node.classList.contains("is-open")), true);
     assert.equal(await page.locator("#mobile-menu-button").getAttribute("aria-expanded"), "true");
-    await page.locator("#sidebar-overlay").click({ force: true });
+    await page.locator("#sidebar-overlay").click({ position: { x: 320, y: 400 } });
     assert.equal(await page.locator("#sidebar").evaluate((node) => node.classList.contains("is-open")), false);
     assert.deepEqual(pageErrors, [], "browser runtime should not throw uncaught errors");
 
