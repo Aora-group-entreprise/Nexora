@@ -249,6 +249,107 @@
     if (textResult && textResult.dataset.analyzed === "true") analyzeText();
   });
 
+
+  // Cultural Bridge: transparent local templates, not a general-purpose translator.
+  const bridgeText = document.getElementById("bridge-text");
+  const bridgeCount = document.getElementById("bridge-count");
+  const bridgeTone = document.getElementById("bridge-tone");
+  const bridgeResult = document.getElementById("bridge-result");
+  const bridgeRewriteButton = document.getElementById("bridge-rewrite-button");
+  const bridgeCopyButton = document.getElementById("bridge-copy-button");
+  const bridgePhrase = document.getElementById("bridge-phrase");
+  const bridgeLanguage = document.getElementById("bridge-language");
+  const bridgePhraseButton = document.getElementById("bridge-phrase-button");
+  const bridgePhraseResult = document.getElementById("bridge-phrase-result");
+
+  const phrasebook = {
+    hello: { fr: "Bonjour !", en: "Hello!", mg: "Manao ahoana!" },
+    thanks: { fr: "Merci beaucoup.", en: "Thank you very much.", mg: "Misaotra indrindra." },
+    welcome: { fr: "Bienvenue !", en: "Welcome!", mg: "Tongasoa!" },
+    follow: { fr: "Suis-moi pour plus de contenu.", en: "Follow me for more content.", mg: "Araho aho raha mila votoaty fanampiny ianao." },
+    newpost: { fr: "Une nouvelle publication est disponible.", en: "A new post is available.", mg: "Misy lahatsoratra vaovao azo jerena." },
+    comment: { fr: "Dis-moi ce que tu en penses en commentaire.", en: "Tell me what you think in the comments.", mg: "Lazao ao amin'ny fanehoan-kevitra ny hevitrao." },
+    share: { fr: "Partage ce message avec tes amis.", en: "Share this post with your friends.", mg: "Zarao amin'ny namanao ity hafatra ity." },
+    support: { fr: "Merci pour ton soutien.", en: "Thank you for your support.", mg: "Misaotra anao amin'ny fanohananao." },
+    comingsoon: { fr: "Bientôt disponible.", en: "Coming soon.", mg: "Ho avy tsy ho ela." },
+    contact: { fr: "Contacte-moi pour en savoir plus.", en: "Contact me to learn more.", mg: "Mifandraisa amiko raha mila fanazavana fanampiny." }
+  };
+
+  const bridgeWords = (value) => value.trim() ? getWords(value.trim()).length : 0;
+  if (bridgeText && bridgeCount) {
+    const updateBridgeCount = () => {
+      bridgeCount.textContent = bridgeText.value.length + " caractère" + (bridgeText.value.length === 1 ? "" : "s") + " · " + bridgeWords(bridgeText.value) + " mot" + (bridgeWords(bridgeText.value) === 1 ? "" : "s");
+    };
+    bridgeText.addEventListener("input", updateBridgeCount);
+    updateBridgeCount();
+  }
+
+  if (bridgeRewriteButton && bridgeText && bridgeResult && bridgeTone && bridgeCopyButton) {
+    bridgeRewriteButton.addEventListener("click", () => {
+      const original = bridgeText.value.trim().replace(/[ \\t]+/g, " ").replace(/\\s*([,;:!?])\\s*/g, "$1 ").replace(/\\s+([.])/g, "$1").trim();
+      if (!original) {
+        bridgeResult.dataset.result = "";
+        bridgeResult.innerHTML = '<p class="result-error">Écris ou colle un texte avant de continuer.</p>';
+        bridgeCopyButton.disabled = true;
+        return;
+      }
+      const tone = bridgeTone.value;
+      let result = original;
+      if (tone === "clear") {
+        result = result.charAt(0).toLocaleUpperCase() + result.slice(1);
+        if (!/[.!?…]$/.test(result)) result += ".";
+      } else if (tone === "friendly") {
+        result = "🙂 " + result;
+        if (!/[.!?…]$/.test(result)) result += ".";
+      } else if (tone === "professional") {
+        result = result.charAt(0).toLocaleUpperCase() + result.slice(1);
+        if (!/[.!?…]$/.test(result)) result += ".";
+      } else if (tone === "engaging") {
+        result = "✨ " + result;
+        if (!/[.!?…]$/.test(result)) result += ".";
+      }
+      bridgeResult.dataset.result = result;
+      bridgeResult.innerHTML = "<h3>Proposition locale</h3><p>" + escapeHtml(result).replace(/\\n/g, "<br>") + "</p><p class=\"field-help\">Suggestion fondée sur des règles de mise en forme ; le sens et l'adaptation culturelle doivent être vérifiés par toi.</p>";
+      bridgeCopyButton.disabled = false;
+    });
+    bridgeCopyButton.addEventListener("click", async () => {
+      const result = bridgeResult.dataset.result || "";
+      if (!result) return;
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(result);
+        } else {
+          const temporary = document.createElement("textarea");
+          temporary.value = result;
+          temporary.setAttribute("readonly", "");
+          temporary.style.position = "absolute";
+          temporary.style.left = "-9999px";
+          document.body.appendChild(temporary);
+          temporary.select();
+          const copied = document.execCommand("copy");
+          temporary.remove();
+          if (!copied) throw new Error("copy unavailable");
+        }
+        bridgeCopyButton.textContent = "Copié !";
+        window.setTimeout(() => { bridgeCopyButton.textContent = "Copier le résultat"; }, 1600);
+      } catch (_) {
+        bridgeResult.insertAdjacentHTML("beforeend", '<p class="result-error">La copie automatique a échoué. Sélectionne le texte et copie-le manuellement.</p>');
+      }
+    });
+  }
+
+  if (bridgePhraseButton && bridgePhrase && bridgeLanguage && bridgePhraseResult) {
+    bridgePhraseButton.addEventListener("click", () => {
+      const item = phrasebook[bridgePhrase.value];
+      const language = bridgeLanguage.value;
+      if (!item || !item[language]) {
+        bridgePhraseResult.innerHTML = '<p class="result-error">Cette expression n’est pas disponible dans cette langue.</p>';
+        return;
+      }
+      bridgePhraseResult.innerHTML = "<h3>Expression proposée</h3><p>" + escapeHtml(item[language]) + "</p><p class=\"field-help\">Phrase prédéfinie · " + escapeHtml(({fr:"Français",en:"English",mg:"Malagasy"})[language] || language) + "</p>";
+    });
+  }
+
   window.addEventListener("popstate", () => {
     const requestedView = window.location.hash.slice(1);
     showView(pageTitles[requestedView] ? requestedView : "overview", {
