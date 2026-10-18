@@ -28,12 +28,14 @@ Certaines fonctions avancées, comme une traduction IA fiable ou des pages de pr
 
 Le dépôt contient le squelette statique initial :
 - `index.html` — structure de la page d'accueil et des quatre vues de navigation ;
-- `styles.css` — styles responsive ;
-- `app.js` — navigation côté navigateur, gestion du menu mobile et navigation avec l'historique ;
+- `styles.css` — mise en page adaptative pour ordinateur, tablette et mobile ;
+- `app.js` — navigation côté navigateur, tiroir mobile, fermeture par voile/Escape et navigation avec l'historique ;
 - `favicon.svg` — icône du site ;
 - `scripts/verify-static.py` — vérifications statiques sans dépendances.
 
-Les trois modules sont encore des écrans d'introduction. Leurs fonctions métier seront implémentées et testées dans les étapes suivantes.
+La navigation responsive est en place : barre latérale complète sur grand écran, rail compact sur tablette et menu tiroir avec voile de fermeture sur petit écran. Les commandes de navigation disposent aussi de noms accessibles. Les trois modules restent des écrans d'introduction ; leurs fonctions métier seront implémentées et testées dans les étapes suivantes.
+
+Les contrôles automatisés vérifient la structure, les ressources locales, les libellés accessibles de la navigation et les bases du comportement responsive. Une inspection visuelle réelle dans plusieurs navigateurs et tailles d'écran reste nécessaire avant de considérer l'interface comme validée sur tous les appareils.
 
 ## Vérifications
 
