@@ -85,10 +85,13 @@ Limite technique : une application purement statique ne fournit pas à elle seul
 - [ ] Corriger les problèmes révélés par ces tests.
 
 ### Phase 3 — Cultural Bridge
-- interface multilingue de saisie et de résultat ;
-- fonctions locales réellement disponibles ;
-- gestion des langues non prises en charge ;
-- aucune fausse promesse de traduction par IA.
+- [x] interface de reformulation et de résultat ;
+- [x] normalisation locale du texte et styles simples (clair, amical, professionnel, engageant) ;
+- [x] mini phrasebook de 10 expressions prédéfinies en français, anglais et malagasy ;
+- [x] copie du résultat avec solution de repli pour les navigateurs plus anciens ;
+- [x] limites clairement annoncées : pas de traduction libre ni de prétendue IA ;
+- [ ] vérifier manuellement la reformulation, les expressions et la copie dans de vrais navigateurs ;
+- [ ] faire relire les traductions du phrasebook par des locuteurs compétents avant lancement public.
 
 ### Phase 4 — Digital Identity
 - éditeur local de fiche ;
