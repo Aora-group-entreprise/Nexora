@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f7f8fc">
+  <meta name="description" content="Nexora aide les créateurs à préparer leurs contenus, adapter leurs messages et organiser leur présence en ligne.">
+  <title>Nexora — L'assistant des créateurs</title>
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./app.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Aller au contenu principal</a>
+
+  <div class="app-shell">
+    <aside class="sidebar" id="sidebar" aria-label="Navigation principale">
+      <a class="brand" href="#overview" data-view="overview" aria-label="Nexora, accueil">
+        <span class="brand-mark" aria-hidden="true">n</span>
+        <span class="brand-name">nexora<span class="brand-dot">.</span></span>
+      </a>
+
+      <div class="sidebar-label">ESPACE CRÉATEUR</div>
+      <nav class="primary-nav" aria-label="Modules">
+        <button class="nav-item is-active" type="button" data-view="overview" aria-current="page">
+          <span class="nav-icon" aria-hidden="true">⌂</span><span>Vue d'ensemble</span>
+        </button>
+        <button class="nav-item" type="button" data-view="content">
+          <span class="nav-icon" aria-hidden="true">◈</span><span>Content Intelligence</span><span class="nav-badge">1</span>
+        </button>
+        <button class="nav-item" type="button" data-view="cultural">
+          <span class="nav-icon" aria-hidden="true">◎</span><span>Cultural Bridge</span>
+        </button>
+        <button class="nav-item" type="button" data-view="identity">
+          <span class="nav-icon" aria-hidden="true">↗</span><span>Digital Identity</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <div class="sidebar-note">
+          <span class="note-spark" aria-hidden="true">✳</span>
+          <p><strong>Un espace pour grandir.</strong><br>Prépare tes contenus. Touche de nouveaux publics.</p>
+        </div>
+        <div class="sidebar-footer"><span class="status-dot" aria-hidden="true"></span> Version initiale · en construction</div>
+      </div>
+    </aside>
+
+    <div class="main-column">
+      <header class="topbar">
+        <button class="mobile-menu-button" id="mobile-menu-button" type="button" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="sidebar">
+          <span></span><span></span><span></span>
+        </button>
+        <div class="breadcrumb"><span>Espace créateur</span><span class="breadcrumb-divider">/</span><strong id="breadcrumb-current">Vue d'ensemble</strong></div>
+        <div class="topbar-right"><span class="local-badge"><span aria-hidden="true">✦</span> Créativité, sans frontières</span><div class="avatar" aria-label="Profil local">N</div></div>
+      </header>
+
+      <main id="main-content" tabindex="-1">
+        <section class="view is-visible" id="view-overview" data-page="overview" aria-labelledby="welcome-title">
+          <div class="hero">
+            <div class="hero-copy">
+              <div class="eyebrow"><span class="eyebrow-line"></span> TON ESPACE CRÉATEUR</div>
+              <h1 id="welcome-title">Tes idées méritent<br>de <span class="gradient-text">voyager plus loin.</span></h1>
+              <p class="hero-description">Prépare de meilleurs contenus, adapte tes messages à de nouveaux publics et rassemble ta présence en ligne. Tout commence ici.</p>
+              <button class="button button-primary" type="button" data-view="content">Explorer les outils <span aria-hidden="true">→</span></button>
+            </div>
+            <div class="hero-art" aria-hidden="true">
+              <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
+              <div class="art-glow"></div>
+              <div class="art-card card-back"><span class="mini-icon pink">✳</span><span class="art-line line-short"></span><span class="art-line"></span><span class="art-line line-mid"></span></div>
+              <div class="art-card card-front"><span class="mini-icon blue">↗</span><div class="art-chart"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div><span class="art-caption">Ton prochain projet commence ici</span></div>
+              <span class="floating-star star-one">✦</span><span class="floating-star star-two">✧</span><span class="floating-dot"></span>
+            </div>
+          </div>
+
+          <div class="section-heading">
+            <div><p class="eyebrow">TA BOÎTE À OUTILS</p><h2>Tout ce qu'il te faut, au même endroit.</h2></div>
+            <span class="section-count">03 modules</span>
+          </div>
+
+          <div class="module-grid">
+            <article class="module-card module-content">
+              <div class="module-card-top"><span class="module-symbol symbol-blue" aria-hidden="true">◈</span><span class="module-index">01 / CONTENU</span></div>
+              <h3>Content Intelligence</h3>
+              <p>Vérifie les aspects techniques de tes médias et améliore tes textes avant de publier.</p>
+              <div class="tag-row"><span>Images</span><span>Vidéos</span><span>Textes</span></div>
+              <button class="text-link" type="button" data-view="content">Découvrir l'outil <span aria-hidden="true">→</span></button>
+            </article>
+            <article class="module-card module-cultural">
+              <div class="module-card-top"><span class="module-symbol symbol-purple" aria-hidden="true">◎</span><span class="module-index">02 / LANGUES</span></div>
+              <h3>Cultural Bridge</h3>
+              <p>Prépare tes messages pour différentes langues, cultures et audiences.</p>
+              <div class="tag-row"><span>Langues</span><span>Ton</span><span>Adaptation</span></div>
+              <button class="text-link" type="button" data-view="cultural">Découvrir l'outil <span aria-hidden="true">→</span></button>
+            </article>
+            <article class="module-card module-identity">
+              <div class="module-card-top"><span class="module-symbol symbol-green" aria-hidden="true">↗</span><span class="module-index">03 / PRÉSENCE</span></div>
+              <h3>Digital Identity</h3>
+              <p>Organise tes profils et prépare une fiche claire à partager avec ton public.</p>
+              <div class="tag-row"><span>Profils</span><span>Liens</span><span>Partage</span></div>
+              <button class="text-link" type="button" data-view="identity">Découvrir l'outil <span aria-hidden="true">→</span></button>
+            </article>
+          </div>
+
+          <div class="bottom-banner"><div class="banner-icon" aria-hidden="true">✦</div><div><strong>Conçu pour les créateurs, partout dans le monde.</strong><p>Nexora est en construction. Les outils seront ajoutés et vérifiés progressivement.</p></div><span class="banner-decoration" aria-hidden="true">N.</span></div>
+        </section>
+
+        <section class="view module-view" id="view-content" data-page="content" aria-labelledby="content-title" hidden>
+          <div class="page-intro"><div class="eyebrow"><span class="eyebrow-line"></span> MODULE 01</div><h1 id="content-title">Content <span class="gradient-text">Intelligence</span></h1><p>Prépare tes médias et tes textes avant de les publier. Les premiers outils d'analyse sont en cours de construction.</p></div>
+          <div class="module-status-card"><div class="status-illustration status-blue" aria-hidden="true">◈</div><div><span class="status-label"><span class="status-dot"></span> PHASE DE CONSTRUCTION</span><h2>L'atelier de contenu arrive.</h2><p>Cette première version posera les bases pour vérifier les dimensions des images, lire les métadonnées vidéo prises en charge et analyser quelques caractéristiques des textes.</p><button class="button button-secondary" type="button" data-view="overview">Retour à la vue d'ensemble</button></div></div>
+          <div class="notice"><span aria-hidden="true">ⓘ</span><p>Les recommandations porteront sur des éléments vérifiables. Nexora ne prétendra pas prédire la viralité d'une publication.</p></div>
+        </section>
+
+        <section class="view module-view" id="view-cultural" data-page="cultural" aria-labelledby="cultural-title" hidden>
+          <div class="page-intro"><div class="eyebrow"><span class="eyebrow-line"></span> MODULE 02</div><h1 id="cultural-title">Cultural <span class="gradient-text">Bridge</span></h1><p>Prépare tes messages pour qu'ils soient compris au-delà des frontières linguistiques et culturelles.</p></div>
+          <div class="module-status-card"><div class="status-illustration status-purple" aria-hidden="true">◎</div><div><span class="status-label"><span class="status-dot"></span> PHASE DE CONSTRUCTION</span><h2>Les mots voyagent bientôt.</h2><p>Nous commencerons par des outils de reformulation et d'adaptation clairement délimités. Les traductions proposées seront identifiées selon les capacités réellement disponibles.</p><button class="button button-secondary" type="button" data-view="overview">Retour à la vue d'ensemble</button></div></div>
+          <div class="notice"><span aria-hidden="true">ⓘ</span><p>Une traduction automatique de qualité ne sera annoncée que lorsqu'une méthode adaptée sera intégrée et testée.</p></div>
+        </section>
+
+        <section class="view module-view" id="view-identity" data-page="identity" aria-labelledby="identity-title" hidden>
+          <div class="page-intro"><div class="eyebrow"><span class="eyebrow-line"></span> MODULE 03</div><h1>Digital <span class="gradient-text">Identity</span></h1><p>Réunis tes liens sociaux et prépare une présence en ligne plus facile à partager.</p></div>
+          <div class="module-status-card"><div class="status-illustration status-green" aria-hidden="true">↗</div><div><span class="status-label"><span class="status-dot"></span> PHASE DE CONSTRUCTION</span><h2>Ta présence, mieux organisée.</h2><p>Nous préparerons un éditeur de fiche et des outils pour organiser et vérifier les liens. Les pages publiques persistantes demanderont une décision technique distincte.</p><button class="button button-secondary" type="button" data-view="overview">Retour à la vue d'ensemble</button></div></div>
+          <div class="notice"><span aria-hidden="true">ⓘ</span><p>Dans cette première étape, aucune fiche n'est publiée ni envoyée à un serveur.</p></div>
+        </section>
+      </main>
+
+      <footer class="page-footer"><span>© <span id="current-year">2026</span> Nexora · Nom de travail</span><span>Fait pour les idées qui vont plus loin <span class="footer-heart" aria-hidden="true">✦</span></span></footer>
+    </div>
+  </div>
+</body>
+</html>
