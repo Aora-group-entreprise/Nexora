@@ -86,6 +86,23 @@ def main():
     styles_css = ROOT / "styles.css"
     if not app_js.is_file():
         errors.append("app.js is missing")
+    required_content_controls = {
+        "content-platform", "image-file", "video-file", "image-result",
+        "video-result", "content-text", "text-count", "text-result",
+        "analyze-text-button",
+    }
+    missing_content_controls = sorted(required_content_controls - set(parser.ids))
+    if missing_content_controls:
+        errors.append("Content Intelligence control(s) missing: " + ", ".join(missing_content_controls))
+
+    if app_js.is_file():
+        js_text = app_js.read_text(encoding="utf-8")
+        for feature in ("function analyzeImage", "function analyzeVideo", "function analyzeText", "URL.createObjectURL", "MAX_FILE_BYTES"):
+            if feature not in js_text:
+                errors.append("Content Intelligence implementation missing: " + feature)
+        if any(network_api in js_text for network_api in ("fetch(", "XMLHttpRequest", "sendBeacon(")):
+            errors.append("unexpected network API found in client-side analysis code")
+
     if not styles_css.is_file():
         errors.append("styles.css is missing")
     else:
@@ -108,6 +125,8 @@ def main():
     print("PASS: responsive viewport and main landmark are present")
     print(f"PASS: {len(parser.nav_controls)} navigation buttons have accessible labels")
     print("PASS: mobile navigation overlay and 760px layout breakpoint are present")
+    print(f"PASS: {len(required_content_controls)} Content Intelligence controls are present")
+    print("PASS: image, video and text analysis hooks are present; no upload API detected")
     print("PASS: local asset paths and CSS brace counts are valid")
     return 0
 
