@@ -93,10 +93,10 @@ async function main() {
     await page.locator("#video-file").setInputFiles({
       name: "sample.webm", mimeType: "video/webm", buffer: Buffer.from("synthetic test fixture")
     });
+    await page.locator("#video-file").dispatchEvent("change");
+    await page.locator("video").waitFor();
     await page.evaluate(() => {
-      const video = document.querySelector("video");
-      if (!video) throw new Error("Video metadata element was not created");
-      video.dispatchEvent(new Event("loadedmetadata"));
+      document.querySelector("video").dispatchEvent(new Event("loadedmetadata"));
     });
     const videoAnalysis = await page.locator("#video-result").innerText();
     assert.match(videoAnalysis, /Analyse technique de la vidéo/);
