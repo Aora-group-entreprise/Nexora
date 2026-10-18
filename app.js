@@ -254,6 +254,7 @@
   const bridgeText = document.getElementById("bridge-text");
   const bridgeCount = document.getElementById("bridge-count");
   const bridgeTone = document.getElementById("bridge-tone");
+  const bridgeSourceLanguage = document.getElementById("bridge-source-language");
   const bridgeResult = document.getElementById("bridge-result");
   const bridgeRewriteButton = document.getElementById("bridge-rewrite-button");
   const bridgeCopyButton = document.getElementById("bridge-copy-button");
@@ -294,19 +295,21 @@
         return;
       }
       const tone = bridgeTone.value;
+      const language = bridgeSourceLanguage ? bridgeSourceLanguage.value : "fr";
       let result = original;
+      if (!/[.!?…]$/.test(result)) result += ".";
       if (tone === "clear") {
         result = result.charAt(0).toLocaleUpperCase() + result.slice(1);
-        if (!/[.!?…]$/.test(result)) result += ".";
       } else if (tone === "friendly") {
-        result = "🙂 " + result;
-        if (!/[.!?…]$/.test(result)) result += ".";
+        const greeting = ({fr:"Salut !",en:"Hey!",mg:"Salama!"})[language];
+        result = greeting + " " + result + " 🙂";
       } else if (tone === "professional") {
-        result = result.charAt(0).toLocaleUpperCase() + result.slice(1);
-        if (!/[.!?…]$/.test(result)) result += ".";
+        const greeting = ({fr:"Bonjour,",en:"Hello,",mg:"Miarahaba,"})[language];
+        const closing = ({fr:"Merci pour votre attention.",en:"Thank you for your attention.",mg:"Misaotra tamin'ny fiheverana."})[language];
+        result = greeting + " " + result.charAt(0).toLocaleLowerCase() + result.slice(1) + " " + closing;
       } else if (tone === "engaging") {
-        result = "✨ " + result;
-        if (!/[.!?…]$/.test(result)) result += ".";
+        const prompt = ({fr:"Qu'en penses-tu ?",en:"What do you think?",mg:"Ahoana ny hevitrao?"})[language];
+        result = "✨ " + result + " " + prompt;
       }
       bridgeResult.dataset.result = result;
       bridgeResult.innerHTML = "<h3>Proposition locale</h3><p>" + escapeHtml(result).replace(/\n/g, "<br>") + "</p><p class=\"field-help\">Suggestion fondée sur des règles de mise en forme ; le sens et l'adaptation culturelle doivent être vérifiés par toi.</p>";
