@@ -33,9 +33,9 @@ Le dépôt contient le squelette statique initial :
 - `favicon.svg` — icône du site ;
 - `scripts/verify-static.py` — vérifications statiques sans dépendances.
 
-La navigation responsive est en place : barre latérale complète sur grand écran, rail compact sur tablette et menu tiroir avec voile de fermeture sur petit écran. Les commandes de navigation disposent aussi de noms accessibles. Les trois modules restent des écrans d'introduction ; leurs fonctions métier seront implémentées et testées dans les étapes suivantes.
+La navigation responsive est en place : barre latérale complète sur grand écran, rail compact sur tablette et menu tiroir avec voile de fermeture sur petit écran. Les commandes de navigation disposent aussi de noms accessibles. Content Intelligence dispose maintenant d'une première version fonctionnelle : analyse locale des dimensions, du poids, du format et du ratio des images ; lecture des métadonnées vidéo prises en charge ; analyse de base des textes (caractères, mots, hashtags, mentions, phrases et répétitions simples). Les recommandations reposent sur des règles explicites et un format cible sélectionnable. Les modules Cultural Bridge et Digital Identity restent des écrans d'introduction.
 
-Les contrôles automatisés vérifient la structure, les ressources locales, les libellés accessibles de la navigation et les bases du comportement responsive. Une inspection visuelle réelle dans plusieurs navigateurs et tailles d'écran reste nécessaire avant de considérer l'interface comme validée sur tous les appareils.
+Les contrôles automatisés vérifient la structure, les ressources locales, les libellés accessibles de la navigation, les bases du comportement responsive et la présence des commandes Content Intelligence. Les fichiers choisis sont traités dans le navigateur, avec une limite de 20 Mo par fichier ; ils ne sont pas envoyés à un serveur. Une inspection visuelle réelle dans plusieurs navigateurs et tailles d'écran reste nécessaire avant de considérer l'interface comme validée sur tous les appareils.
 
 ## Vérifications
 
