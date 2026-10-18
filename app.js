@@ -117,6 +117,22 @@
   const textResult = document.getElementById("text-result");
   const analyzeTextButton = document.getElementById("analyze-text-button");
   const MAX_FILE_BYTES = 20 * 1024 * 1024;
+  let imageAnalysisId = 0;
+  let videoAnalysisId = 0;
+  // Dynamic Unicode patterns prevent parse errors on older browsers.
+  const WORD_PATTERN = (() => {
+    try { return new RegExp("[\\p{L}\\p{N}]+(?:['’][\\p{L}]+)*", "gu"); }
+    catch (_) { return /[A-Za-z0-9À-ÖØ-öø-ÿ]+(?:['’][A-Za-zÀ-ÖØ-öø-ÿ]+)*/g; }
+  })();
+  const HASHTAG_PATTERN = (() => {
+    try { return new RegExp("#[\\p{L}\\p{N}_]+", "gu"); }
+    catch (_) { return /#[A-Za-z0-9À-ÖØ-öø-ÿ_]+/g; }
+  })();
+  const MENTION_PATTERN = (() => {
+    try { return new RegExp("@[\\p{L}\\p{N}_.]+", "gu"); }
+    catch (_) { return /@[A-Za-z0-9À-ÖØ-öø-ÿ_.]+/g; }
+  })();
+  const getWords = (text) => text.match(WORD_PATTERN) || [];
   const formatBytes = (bytes) => bytes < 1024 ? bytes + " o" : bytes < 1048576 ? (bytes / 1024).toFixed(1) + " Ko" : (bytes / 1048576).toFixed(2) + " Mo";
   const formatDuration = (seconds) => {
     if (!Number.isFinite(seconds) || seconds < 0) return "Indisponible";
@@ -136,6 +152,7 @@
   const showError = (element, message) => { if (element) element.innerHTML = '<p class="result-error">' + escapeHtml(message) + "</p>"; };
 
   function analyzeImage(file) {
+    const requestId = ++imageAnalysisId;
     if (!imageResult) return;
     if (!file) { imageResult.textContent = "Choisis une image pour afficher ses informations."; return; }
     if (!file.type.startsWith("image/")) { showError(imageResult, "Ce fichier n'est pas reconnu comme une image."); return; }
@@ -144,7 +161,10 @@
     const url = URL.createObjectURL(file), image = new Image();
     image.onload = () => {
       URL.revokeObjectURL(url);
+      if (requestId !== imageAnalysisId) return;
       const width = image.naturalWidth, height = image.naturalHeight, ratio = width / height, target = getTarget(), advice = [];
+      if (!width || !height) { showError(imageResult, "Les dimensions de cette image sont indisponibles."); return; }
+      if (width > 30000 || height > 30000) { showError(imageResult, "Cette image a des dimensions très élevées et risque de ralentir cet appareil."); return; }
       if (width < 720 || height < 720) advice.push("L'image est relativement petite ; vérifie sa netteté dans le format choisi.");
       if (target) {
         if (Math.abs(ratio - target.width / target.height) / (target.width / target.height) > .05) advice.push("Le ratio diffère du repère cible " + target.width + " × " + target.height + " px ; un recadrage peut être nécessaire.");
@@ -155,11 +175,12 @@
         {label:"Format",value:file.type||"Non précisé"},{label:"Ratio",value:ratio.toFixed(2)+":1"}
       ]) + renderAdvice(advice);
     };
-    image.onerror = () => { URL.revokeObjectURL(url); showError(imageResult, "Le navigateur n'a pas pu lire cette image. Essaie un autre format."); };
+    image.onerror = () => { URL.revokeObjectURL(url); if (requestId === imageAnalysisId) showError(imageResult, "Le navigateur n'a pas pu lire cette image. Essaie un autre format."); };
     image.src = url;
   }
 
   function analyzeVideo(file) {
+    const requestId = ++videoAnalysisId;
     if (!videoResult) return;
     if (!file) { videoResult.textContent = "Choisis une vidéo pour lire ses métadonnées."; return; }
     if (!file.type.startsWith("video/")) { showError(videoResult, "Ce fichier n'est pas reconnu comme une vidéo."); return; }
@@ -169,6 +190,7 @@
     video.preload = "metadata";
     const cleanup = () => { URL.revokeObjectURL(url); video.removeAttribute("src"); video.load(); };
     video.onloadedmetadata = () => {
+      if (requestId !== videoAnalysisId) { cleanup(); return; }
       const width = video.videoWidth, height = video.videoHeight, target = getTarget(), advice = [];
       if (target && width && height) {
         const ratio = width / height, targetRatio = target.width / target.height;
@@ -181,7 +203,7 @@
       ]) + renderAdvice(advice);
       cleanup();
     };
-    video.onerror = () => { cleanup(); showError(videoResult, "Impossible de lire les métadonnées de ce format dans ce navigateur."); };
+    video.onerror = () => { cleanup(); if (requestId === videoAnalysisId) showError(videoResult, "Impossible de lire les métadonnées de ce format dans ce navigateur."); };
     video.src = url;
   }
 
@@ -189,9 +211,9 @@
     if (!textInput || !textResult) return;
     const value = textInput.value.trim();
     if (!value) { textResult.dataset.analyzed = "false"; showError(textResult, "Saisis un texte avant de lancer l'analyse."); return; }
-    const words = value.match(/[\p{L}\p{N}]+(?:['’][\p{L}]+)*/gu) || [];
-    const hashtags = value.match(/#[\p{L}\p{N}_]+/gu) || [];
-    const mentions = value.match(/@[\p{L}\p{N}_.]+/gu) || [];
+    const words = getWords(value);
+    const hashtags = value.match(HASHTAG_PATTERN) || [];
+    const mentions = value.match(MENTION_PATTERN) || [];
     const sentences = value.split(/[.!?…]+/).map((s) => s.trim()).filter(Boolean);
     const stop = new Set(["avec","dans","pour","mais","donc","alors","cette","cela","vous","nous","votre","the","and","for","that","this","with","from","have","your"]);
     const counts = new Map();
@@ -200,7 +222,7 @@
     const advice = [];
     if (value.length > 2200) advice.push("Le texte est long ("+value.length+" caractères) ; vérifie la limite de la plateforme choisie.");
     if (words.length < 5) advice.push("Le texte est très court ; ajoute du contexte si ton public en a besoin.");
-    if (sentences.some((s)=>(s.match(/[\p{L}\p{N}]+/gu)||[]).length>30)) advice.push("Au moins une phrase est longue ; essaie de la raccourcir.");
+    if (sentences.some((sentence) => getWords(sentence).length > 30)) advice.push("Au moins une phrase est longue ; essaie de la raccourcir.");
     if (repeated.length) advice.push("Mots répétés : "+repeated.map((entry)=>entry[0]+" ("+entry[1]+" fois)").join(", ")+".");
     if (hashtags.length > 10) advice.push("Le texte contient "+hashtags.length+" hashtags ; garde ceux qui sont pertinents.");
     if (value.length > 500 && sentences.length < 2) advice.push("Pense à séparer le texte en phrases ou paragraphes plus courts.");
@@ -215,7 +237,7 @@
   if (videoInput) videoInput.addEventListener("change", () => analyzeVideo(videoInput.files && videoInput.files[0]));
   if (textInput && textCount) {
     const updateCount = () => {
-      const value = textInput.value, words = value.trim() ? (value.trim().match(/[\p{L}\p{N}]+(?:['’][\p{L}]+)*/gu)||[]).length : 0;
+      const value = textInput.value, words = value.trim() ? getWords(value.trim()).length : 0;
       textCount.textContent = value.length+" caractère"+(value.length===1?"":"s")+" · "+words+" mot"+(words===1?"":"s");
     };
     textInput.addEventListener("input", updateCount); updateCount();
