@@ -165,15 +165,22 @@
       const width = image.naturalWidth, height = image.naturalHeight, ratio = width / height, target = getTarget(), advice = [];
       if (!width || !height) { showError(imageResult, "Les dimensions de cette image sont indisponibles."); return; }
       if (width > 30000 || height > 30000) { showError(imageResult, "Cette image a des dimensions très élevées et risque de ralentir cet appareil."); return; }
-      if (width < 720 || height < 720) advice.push("L'image est relativement petite ; vérifie sa netteté dans le format choisi.");
+      const pixels = width * height;
+      if (width < 720 || height < 720) advice.push("La résolution est relativement petite. Vérifie le rendu en plein écran et évite d'agrandir fortement l'image, car elle pourrait devenir floue.");
+      if (pixels > 40000000) advice.push("L'image contient plus de 40 mégapixels. Elle peut être lourde à manipuler sur un téléphone ancien ; conserve une copie optimisée pour le web.");
+      if (file.size > 8 * 1024 * 1024) advice.push("Le fichier dépasse 8 Mo. Si le chargement est lent, exporte une version compressée en gardant une netteté suffisante.");
       if (target) {
-        if (Math.abs(ratio - target.width / target.height) / (target.width / target.height) > .05) advice.push("Le ratio diffère du repère cible " + target.width + " × " + target.height + " px ; un recadrage peut être nécessaire.");
-        if (width < target.width || height < target.height) advice.push("La résolution est inférieure au repère cible de " + target.width + " × " + target.height + " px.");
+        if (Math.abs(ratio - target.width / target.height) / (target.width / target.height) > .05) advice.push("Le ratio diffère du repère cible " + target.width + " × " + target.height + " px. Recadre en gardant le sujet principal dans une zone sûre, loin des bords.");
+        if (width < target.width || height < target.height) advice.push("La résolution est inférieure au repère cible de " + target.width + " × " + target.height + " px. Si possible, exporte une version plus grande pour limiter le flou.");
       }
-      imageResult.innerHTML = "<h3>Résultat de l'analyse</h3>" + renderMetrics([
+      if (ratio > 2.2 || ratio < .45) advice.push("Le format est très panoramique ou très étroit. Vérifie que le sujet reste visible dans l'aperçu mobile et que le recadrage ne coupe rien d'important.");
+      advice.push("Vérification visuelle à faire : le sujet doit être immédiatement identifiable, le contraste suffisant et tout texte intégré à l'image lisible sur un petit écran.");
+      advice.push("Si l'image transmet une information importante, ajoute aussi une description accessible dans la publication. Cette analyse mesure les propriétés du fichier ; elle ne comprend pas la scène représentée.");
+      imageResult.innerHTML = "<h3>Analyse technique de l'image</h3>" + renderMetrics([
         {label:"Dimensions",value:width+" × "+height+" px"},{label:"Poids",value:formatBytes(file.size)},
-        {label:"Format",value:file.type||"Non précisé"},{label:"Ratio",value:ratio.toFixed(2)+":1"}
-      ]) + renderAdvice(advice);
+        {label:"Format",value:file.type||"Non précisé"},{label:"Ratio",value:ratio.toFixed(2)+":1"},
+        {label:"Pixels",value:pixels.toLocaleString("fr-FR")}
+      ]) + "<h3>Conseils pour améliorer le visuel</h3>" + renderAdvice(advice) + "<p class=\\"field-help\\">Nexora ne juge pas automatiquement le sujet, la composition, les couleurs ou la qualité artistique de l'image. Contrôle ces éléments à l'œil avant de publier.</p>";
     };
     image.onerror = () => { URL.revokeObjectURL(url); if (requestId === imageAnalysisId) showError(imageResult, "Le navigateur n'a pas pu lire cette image. Essaie un autre format."); };
     image.src = url;
@@ -191,16 +198,21 @@
     const cleanup = () => { URL.revokeObjectURL(url); video.removeAttribute("src"); video.load(); };
     video.onloadedmetadata = () => {
       if (requestId !== videoAnalysisId) { cleanup(); return; }
-      const width = video.videoWidth, height = video.videoHeight, target = getTarget(), advice = [];
+      const width = video.videoWidth, height = video.videoHeight, duration = video.duration, target = getTarget(), advice = [];
       if (target && width && height) {
         const ratio = width / height, targetRatio = target.width / target.height;
-        if (Math.abs(ratio - targetRatio) / targetRatio > .05) advice.push("Le ratio diffère du repère cible " + target.width + " × " + target.height + " px.");
-        if (width < target.width || height < target.height) advice.push("La résolution est inférieure au repère cible.");
+        if (Math.abs(ratio - targetRatio) / targetRatio > .05) advice.push("Le ratio diffère du repère cible " + target.width + " × " + target.height + " px. Vérifie le recadrage pour ne pas couper le sujet.");
+        if (width < target.width || height < target.height) advice.push("La résolution est inférieure au repère cible. Si possible, exporte une version plus nette adaptée au format choisi.");
       }
-      videoResult.innerHTML = "<h3>Résultat des métadonnées</h3>" + renderMetrics([
+      if (duration > 60) advice.push("La vidéo dure plus d'une minute. Vérifie que l'idée principale arrive tôt et que chaque séquence apporte quelque chose ; la durée idéale dépend de la plateforme et du sujet.");
+      if (duration > 0 && duration < 5) advice.push("La vidéo est très courte. Vérifie que le contexte et le message restent compréhensibles, même sans explication supplémentaire.");
+      if (file.size > 8 * 1024 * 1024) advice.push("Le fichier dépasse 8 Mo. Une exportation plus légère peut accélérer l'envoi, à condition de préserver une qualité acceptable.");
+      advice.push("Contrôle le début de la vidéo : le sujet ou le bénéfice doit être clair rapidement, sans promettre plus que ce que le contenu montre.");
+      advice.push("Vérifie manuellement le son, les sous-titres, la lisibilité du texte à l'écran et le rythme des coupes. Ces éléments ne peuvent pas être évalués à partir des seules métadonnées.");
+      videoResult.innerHTML = "<h3>Analyse technique de la vidéo</h3>" + renderMetrics([
         {label:"Dimensions",value:width&&height?width+" × "+height+" px":"Indisponibles"},
-        {label:"Durée",value:formatDuration(video.duration)},{label:"Poids",value:formatBytes(file.size)},{label:"Format déclaré",value:file.type||"Non précisé"}
-      ]) + renderAdvice(advice);
+        {label:"Durée",value:formatDuration(duration)},{label:"Poids",value:formatBytes(file.size)},{label:"Format déclaré",value:file.type||"Non précisé"}
+      ]) + "<h3>Conseils pour améliorer la vidéo</h3>" + renderAdvice(advice) + "<p class=\\"field-help\\">Nexora lit les métadonnées prises en charge par le navigateur ; il ne regarde ni n'écoute le contenu de la vidéo.</p>";
       cleanup();
     };
     video.onerror = () => { cleanup(); if (requestId === videoAnalysisId) showError(videoResult, "Impossible de lire les métadonnées de ce format dans ce navigateur."); };
@@ -279,6 +291,21 @@
     advice.push(platformAdvice[platform] || platformAdvice.general);
 
     if (advice.length === 1) advice.unshift("Aucun problème de structure évident n'a été repéré par les règles de base. Cela ne garantit ni la qualité éditoriale ni les performances du post.");
+
+    const improvementSteps = [];
+    if (words.length < 12) improvementSteps.push("Ajoute une phrase qui explique pourquoi ce sujet est utile ou intéressant pour ton public.");
+    if (!hasOpeningHook && words.length >= 8) improvementSteps.push("Exemple d'accroche à adapter : « Voici ce que j'aurais aimé savoir avant de commencer… » Remplace cette formule par une promesse précise liée à ton vrai contenu.");
+    if (firstLineWords.length > 18) improvementSteps.push("Réécris la première ligne en une idée principale, puis garde les détails dans la suite du texte.");
+    if (averageSentenceLength > 18) improvementSteps.push("Essaie ce format : une idée par phrase, puis un saut de ligne quand tu passes à une nouvelle idée.");
+    if (!hasCallToAction && words.length >= 8) improvementSteps.push("Si tu souhaites susciter des réponses, termine par une question précise, par exemple : « Quelle partie aimerais-tu que je développe ensuite ? »");
+    if (hashtags.length === 0 && words.length >= 8) improvementSteps.push("Si la plateforme et le sujet s'y prêtent, ajoute quelques hashtags précis liés au thème ; évite les tags populaires mais sans rapport.");
+    if (hashtags.length > 0) improvementSteps.push("Choisis les hashtags selon le sujet, le public visé et les termes qu'il pourrait rechercher, plutôt que d'ajouter des hashtags génériques.");
+    if (lines.length === 1 && value.length > 180) improvementSteps.push("Aère la légende en 2 à 4 petits paragraphes pour faciliter la lecture sur téléphone.");
+    if (value.length >= 12) improvementSteps.push("Avant de publier, vérifie : une idée principale claire, une information concrète ou un exemple, un ton adapté au public et une dernière relecture.");
+    const improvementHtml = improvementSteps.length
+      ? "<h3>Comment améliorer ce contenu</h3><ul>" + improvementSteps.map((item) => "<li>" + escapeHtml(item) + "</li>").join("") + "</ul>"
+      : "<h3>Comment améliorer ce contenu</h3><p>Développe un peu le contexte, précise ce que le public doit retenir et relis le texte à voix haute pour repérer les formulations peu naturelles.</p>";
+
     textResult.dataset.analyzed = "true";
     textResult.innerHTML = "<h3>Analyse du texte</h3>" + renderMetrics([
       {label:"Caractères",value:String(value.length)},
@@ -289,7 +316,7 @@
       {label:"Phrases détectées",value:String(sentences.length)},
       {label:"Mots moyens / phrase",value:sentences.length ? averageSentenceLength.toFixed(1) : "0"},
       {label:"Émojis détectés",value:String(emojiCount)}
-    ]) + "<h3>Conseils adaptés</h3><ul>" + advice.map((item) => "<li>" + escapeHtml(item) + "</li>").join("") + "</ul><p class=\"field-help\">Analyse locale fondée sur des règles et des mots-clés : elle peut manquer le contexte, l'ironie ou la langue exacte. Elle ne prédit pas la viralité et n'envoie pas ton texte à un serveur.</p>";
+    ]) + "<h3>Conseils adaptés</h3><ul>" + advice.map((item) => "<li>" + escapeHtml(item) + "</li>").join("") + "</ul>" + improvementHtml + "<p class=\\"field-help\\">Analyse locale fondée sur des règles et des mots-clés : elle peut manquer le contexte, l'ironie ou la langue exacte. Les exemples sont des pistes à adapter, pas des corrections garanties. Elle ne prédit pas la viralité et n'envoie pas ton texte à un serveur.</p>";
   }
   if (imageInput) imageInput.addEventListener("change", () => analyzeImage(imageInput.files && imageInput.files[0]));
   if (videoInput) videoInput.addEventListener("change", () => analyzeVideo(videoInput.files && videoInput.files[0]));
