@@ -75,11 +75,14 @@ Limite technique : une application purement statique ne fournit pas à elle seul
 - mettre en place les styles responsive et les états d'erreur.
 
 ### Phase 2 — Content Intelligence
-- analyse technique des images ;
-- lecture des métadonnées vidéo prises en charge ;
-- outils d'analyse textuelle simples ;
-- recommandations vérifiables ;
-- tests sur plusieurs formats et tailles.
+- [x] Interface d'analyse locale pour images, vidéos et textes ;
+- [x] Dimensions, format déclaré, poids et ratio des images ;
+- [x] Lecture des dimensions, durée et poids des vidéos lorsque le navigateur le permet ;
+- [x] Analyse textuelle simple : caractères, mots, hashtags, mentions, phrases et répétitions ;
+- [x] Choix d'un format cible et recommandations fondées sur des règles explicites ;
+- [x] Limite de 20 Mo par fichier et traitement local sans téléversement ;
+- [ ] Tester manuellement plusieurs formats de médias et plusieurs tailles d'écran dans de vrais navigateurs ;
+- [ ] Corriger les problèmes révélés par ces tests.
 
 ### Phase 3 — Cultural Bridge
 - interface multilingue de saisie et de résultat ;
