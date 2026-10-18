@@ -44,7 +44,8 @@ def fail(message):
 def main():
     html_path = ROOT / "index.html"
     if not html_path.is_file():
-        return 1 if fail("index.html is missing") else 0
+        fail("index.html is missing")
+        return 1
 
     parser = AppMarkupParser()
     parser.feed(html_path.read_text(encoding="utf-8"))
@@ -80,8 +81,10 @@ def main():
         errors.append("app.js is missing")
     if not styles_css.is_file():
         errors.append("styles.css is missing")
-    elif styles_css.read_text(encoding="utf-8").count("{") != styles_css.read_text(encoding="utf-8").count("}"):
-        errors.append("styles.css has an unmatched brace count")
+    else:
+        css_text = styles_css.read_text(encoding="utf-8")
+        if css_text.count("{") != css_text.count("}"):
+            errors.append("styles.css has an unmatched brace count")
 
     if errors:
         for error in errors:
