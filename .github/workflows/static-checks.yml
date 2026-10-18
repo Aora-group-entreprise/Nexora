@@ -30,6 +30,8 @@ jobs:
         run: node --check tests/browser-smoke.cjs
       - name: Run static application smoke checks
         run: python scripts/verify-static.py
+      - name: Validate Cloudflare Pages deployment files
+        run: python scripts/verify-deployment.py
       - name: Install Playwright and Chromium
         run: |
           npm init -y
