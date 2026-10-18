@@ -22,16 +22,16 @@
 
       <div class="sidebar-label">ESPACE CRÉATEUR</div>
       <nav class="primary-nav" aria-label="Modules">
-        <button class="nav-item is-active" type="button" data-view="overview" aria-current="page">
+        <button class="nav-item is-active" type="button" data-view="overview" aria-label="Vue d&#39;ensemble" title="Vue d&#39;ensemble" aria-current="page">
           <span class="nav-icon" aria-hidden="true">⌂</span><span>Vue d'ensemble</span>
         </button>
-        <button class="nav-item" type="button" data-view="content">
+        <button class="nav-item" type="button" data-view="content" aria-label="Content Intelligence" title="Content Intelligence">
           <span class="nav-icon" aria-hidden="true">◈</span><span>Content Intelligence</span>
         </button>
-        <button class="nav-item" type="button" data-view="cultural">
+        <button class="nav-item" type="button" data-view="cultural" aria-label="Cultural Bridge" title="Cultural Bridge">
           <span class="nav-icon" aria-hidden="true">◎</span><span>Cultural Bridge</span>
         </button>
-        <button class="nav-item" type="button" data-view="identity">
+        <button class="nav-item" type="button" data-view="identity" aria-label="Digital Identity" title="Digital Identity">
           <span class="nav-icon" aria-hidden="true">↗</span><span>Digital Identity</span>
         </button>
       </nav>
@@ -44,6 +44,8 @@
         <div class="sidebar-footer"><span class="status-dot" aria-hidden="true"></span> Version initiale · en construction</div>
       </div>
     </aside>
+
+    <button class="sidebar-overlay" id="sidebar-overlay" type="button" aria-label="Fermer le menu" hidden></button>
 
     <div class="main-column">
       <header class="topbar">
