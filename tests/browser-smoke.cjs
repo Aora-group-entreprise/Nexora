@@ -76,6 +76,28 @@ async function main() {
     await page.locator("#bridge-rewrite-button").click();
     assert.match(await page.locator("#bridge-result").innerText(), /Salut !/);
     assert.match(await page.locator("#bridge-result").innerText(), /bonjour à tous/i);
+    assert.match(await page.locator("#bridge-result").innerText(), /Conseils pour améliorer ce message/);
+    assert.match(await page.locator("#bridge-result").innerText(), /Exemple :/);
+    assert.equal(await page.locator("#bridge-copy-button").isDisabled(), false);
+
+    // Normalization and safety: punctuation is tidied and user HTML is escaped.
+    await page.locator("#bridge-tone").selectOption("clear");
+    await page.locator("#bridge-text").fill("bonjour    monde!!!");
+    await page.locator("#bridge-rewrite-button").click();
+    assert.match(await page.locator("#bridge-result").innerText(), /Bonjour monde!/);
+    await page.locator("#bridge-text").fill("<script>hello</script>");
+    await page.locator("#bridge-rewrite-button").click();
+    assert.equal(await page.locator("#bridge-result script").count(), 0);
+    assert.match(await page.locator("#bridge-result").innerText(), /Conseils pour améliorer ce message/);
+
+    await page.locator("#bridge-text").fill("   ");
+    await page.locator("#bridge-rewrite-button").click();
+    assert.match(await page.locator("#bridge-result").innerText(), /Écris ou colle un texte/);
+    assert.equal(await page.locator("#bridge-copy-button").isDisabled(), true);
+
+    await page.locator("#bridge-text").fill("bonjour à tous");
+    await page.locator("#bridge-tone").selectOption("friendly");
+    await page.locator("#bridge-rewrite-button").click();
     await page.locator("#bridge-language").selectOption("mg");
     await page.locator("#bridge-phrase-button").click();
     assert.match(await page.locator("#bridge-phrase-result").innerText(), /Manao ahoana/);
