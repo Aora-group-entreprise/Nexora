@@ -180,7 +180,7 @@
         {label:"Dimensions",value:width+" × "+height+" px"},{label:"Poids",value:formatBytes(file.size)},
         {label:"Format",value:file.type||"Non précisé"},{label:"Ratio",value:ratio.toFixed(2)+":1"},
         {label:"Pixels",value:pixels.toLocaleString("fr-FR")}
-      ]) + "<h3>Conseils pour améliorer le visuel</h3>" + renderAdvice(advice) + "<p class=\\"field-help\\">Nexora ne juge pas automatiquement le sujet, la composition, les couleurs ou la qualité artistique de l'image. Contrôle ces éléments à l'œil avant de publier.</p>";
+      ]) + "<h3>Conseils pour améliorer le visuel</h3>" + renderAdvice(advice) + "<p class=\"field-help\">Nexora ne juge pas automatiquement le sujet, la composition, les couleurs ou la qualité artistique de l'image. Contrôle ces éléments à l'œil avant de publier.</p>";
     };
     image.onerror = () => { URL.revokeObjectURL(url); if (requestId === imageAnalysisId) showError(imageResult, "Le navigateur n'a pas pu lire cette image. Essaie un autre format."); };
     image.src = url;
@@ -212,7 +212,7 @@
       videoResult.innerHTML = "<h3>Analyse technique de la vidéo</h3>" + renderMetrics([
         {label:"Dimensions",value:width&&height?width+" × "+height+" px":"Indisponibles"},
         {label:"Durée",value:formatDuration(duration)},{label:"Poids",value:formatBytes(file.size)},{label:"Format déclaré",value:file.type||"Non précisé"}
-      ]) + "<h3>Conseils pour améliorer la vidéo</h3>" + renderAdvice(advice) + "<p class=\\"field-help\\">Nexora lit les métadonnées prises en charge par le navigateur ; il ne regarde ni n'écoute le contenu de la vidéo.</p>";
+      ]) + "<h3>Conseils pour améliorer la vidéo</h3>" + renderAdvice(advice) + "<p class=\"field-help\">Nexora lit les métadonnées prises en charge par le navigateur ; il ne regarde ni n'écoute le contenu de la vidéo.</p>";
       cleanup();
     };
     video.onerror = () => { cleanup(); if (requestId === videoAnalysisId) showError(videoResult, "Impossible de lire les métadonnées de ce format dans ce navigateur."); };
@@ -316,7 +316,7 @@
       {label:"Phrases détectées",value:String(sentences.length)},
       {label:"Mots moyens / phrase",value:sentences.length ? averageSentenceLength.toFixed(1) : "0"},
       {label:"Émojis détectés",value:String(emojiCount)}
-    ]) + "<h3>Conseils adaptés</h3><ul>" + advice.map((item) => "<li>" + escapeHtml(item) + "</li>").join("") + "</ul>" + improvementHtml + "<p class=\\"field-help\\">Analyse locale fondée sur des règles et des mots-clés : elle peut manquer le contexte, l'ironie ou la langue exacte. Les exemples sont des pistes à adapter, pas des corrections garanties. Elle ne prédit pas la viralité et n'envoie pas ton texte à un serveur.</p>";
+    ]) + "<h3>Conseils adaptés</h3><ul>" + advice.map((item) => "<li>" + escapeHtml(item) + "</li>").join("") + "</ul>" + improvementHtml + "<p class=\"field-help\">Analyse locale fondée sur des règles et des mots-clés : elle peut manquer le contexte, l'ironie ou la langue exacte. Les exemples sont des pistes à adapter, pas des corrections garanties. Elle ne prédit pas la viralité et n'envoie pas ton texte à un serveur.</p>";
   }
   if (imageInput) imageInput.addEventListener("change", () => analyzeImage(imageInput.files && imageInput.files[0]));
   if (videoInput) videoInput.addEventListener("change", () => analyzeVideo(videoInput.files && videoInput.files[0]));
