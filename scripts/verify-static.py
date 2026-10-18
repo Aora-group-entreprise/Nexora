@@ -94,12 +94,28 @@ def main():
     missing_content_controls = sorted(required_content_controls - set(parser.ids))
     if missing_content_controls:
         errors.append("Content Intelligence control(s) missing: " + ", ".join(missing_content_controls))
+    required_bridge_controls = {
+        "bridge-tone", "bridge-text", "bridge-count", "bridge-rewrite-button",
+        "bridge-result", "bridge-copy-button", "bridge-phrase", "bridge-language",
+        "bridge-phrase-button", "bridge-phrase-result",
+    }
+    missing_bridge_controls = sorted(required_bridge_controls - set(parser.ids))
+    if missing_bridge_controls:
+        errors.append("Cultural Bridge control(s) missing: " + ", ".join(missing_bridge_controls))
 
     if app_js.is_file():
         js_text = app_js.read_text(encoding="utf-8")
         for feature in ("function analyzeImage", "function analyzeVideo", "function analyzeText", "URL.createObjectURL", "MAX_FILE_BYTES"):
             if feature not in js_text:
                 errors.append("Content Intelligence implementation missing: " + feature)
+        for feature in ("imageAnalysisId", "videoAnalysisId", "WORD_PATTERN", "function analyzeText"):
+            if feature not in js_text:
+                errors.append("Content Intelligence safety/compatibility feature missing: " + feature)
+        if "/[\\\\p{L}\\\\p{N}]+/gu" in js_text:
+            errors.append("Unicode property escape literal may break older browsers")
+        for feature in ("const phrasebook", "bridge-rewrite-button", "bridge-copy-button", "bridge-phrase-button"):
+            if feature not in js_text:
+                errors.append("Cultural Bridge implementation missing: " + feature)
         if any(network_api in js_text for network_api in ("fetch(", "XMLHttpRequest", "sendBeacon(")):
             errors.append("unexpected network API found in client-side analysis code")
 
@@ -127,6 +143,8 @@ def main():
     print("PASS: mobile navigation overlay and 760px layout breakpoint are present")
     print(f"PASS: {len(required_content_controls)} Content Intelligence controls are present")
     print("PASS: image, video and text analysis hooks are present; no upload API detected")
+    print(f"PASS: {len(required_bridge_controls)} Cultural Bridge controls are present")
+    print("PASS: local phrasebook, reformulation, copy fallback, browser compatibility and stale-result guards are present")
     print("PASS: local asset paths and CSS brace counts are valid")
     return 0
 
