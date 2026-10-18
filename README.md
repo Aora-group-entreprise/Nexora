@@ -26,7 +26,7 @@ Certaines fonctions avancées, comme une traduction IA fiable ou des pages de pr
 
 ## Plan de construction
 
-Lire [docs/PRODUCT_PLAN.md](docs/PRODUCT_PLAN.md) pour le positionnement, le périmètre du MVP, les phases de développement et les critères d'acceptation.
+Lire [docs/PRODUCT_PLAN.md](docs/PRODUCT_PLAN.md) pour le positionnement, le périmètre du MVP, les phases de développement et les critères d'acceptation. Le contrôle local sans dépendances peut être lancé avec `python scripts/verify-static.py` ; la syntaxe JavaScript est vérifiée avec `node --check app.js`.
 
 ## État du projet
 
