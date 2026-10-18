@@ -78,7 +78,7 @@
     });
 
     document.addEventListener("click", (event) => {
-      if (window.matchMedia("(max-width: 560px)").matches &&
+      if (window.matchMedia("(max-width: 900px)").matches &&
           sidebar.classList.contains("is-open") &&
           !sidebar.contains(event.target) &&
           !menuButton.contains(event.target)) {
