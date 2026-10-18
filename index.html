@@ -198,9 +198,45 @@
         </section>
 
         <section class="view module-view" id="view-identity" data-page="identity" aria-labelledby="identity-title" hidden>
-          <div class="page-intro"><div class="eyebrow"><span class="eyebrow-line"></span> MODULE 03</div><h1>Digital <span class="gradient-text">Identity</span></h1><p>Réunis tes liens sociaux et prépare une présence en ligne plus facile à partager.</p></div>
-          <div class="module-status-card"><div class="status-illustration status-green" aria-hidden="true">↗</div><div><span class="status-label"><span class="status-dot"></span> PHASE DE CONSTRUCTION</span><h2>Ta présence, mieux organisée.</h2><p>Nous préparerons un éditeur de fiche et des outils pour organiser et vérifier les liens. Les pages publiques persistantes demanderont une décision technique distincte.</p><button class="button button-secondary" type="button" data-view="overview">Retour à la vue d'ensemble</button></div></div>
-          <div class="notice"><span aria-hidden="true">ⓘ</span><p>Dans cette première étape, aucune fiche n'est publiée ni envoyée à un serveur.</p></div>
+          <div class="page-intro"><div class="eyebrow"><span class="eyebrow-line"></span> MODULE 03</div><h1 id="identity-title">Digital <span class="gradient-text">Identity</span></h1><p>Crée une fiche de créateur claire et organise tous tes liens sociaux dans un seul endroit.</p></div>
+          <div class="notice"><span aria-hidden="true">🔒</span><p><strong>Privé par défaut :</strong> ta fiche est enregistrée uniquement dans le stockage local de ce navigateur. Elle n'est pas publiée et ne sera pas automatiquement synchronisée avec tes autres appareils.</p></div>
+          <div class="identity-layout">
+            <form class="tool-card identity-editor" id="identity-form">
+              <div class="tool-card-heading"><div class="module-symbol symbol-green" aria-hidden="true">↗</div><div><h2>Ta fiche de créateur</h2><p>Remplis les informations que tu souhaites partager.</p></div></div>
+              <label class="field-label" for="identity-name">Nom affiché <span aria-hidden="true">*</span></label>
+              <input class="field-control" id="identity-name" name="name" maxlength="60" autocomplete="name" placeholder="Ex. Alex Creator" required>
+              <label class="field-label identity-field-gap" for="identity-handle">Nom d'utilisateur</label>
+              <input class="field-control" id="identity-handle" name="handle" maxlength="30" autocomplete="nickname" placeholder="Ex. alex.creates" pattern="[A-Za-z0-9._-]*" aria-describedby="identity-handle-help">
+              <p class="field-help" id="identity-handle-help">Sans @. Lettres, chiffres, points, tirets et tirets bas.</p>
+              <label class="field-label identity-field-gap" for="identity-tagline">Phrase courte</label>
+              <input class="field-control" id="identity-tagline" name="tagline" maxlength="100" placeholder="Ex. Créateur, passionné et curieux">
+              <label class="field-label identity-field-gap" for="identity-bio">Présentation</label>
+              <textarea class="field-control text-area identity-bio" id="identity-bio" name="bio" maxlength="500" placeholder="Présente-toi en quelques phrases…" aria-describedby="identity-bio-count"></textarea>
+              <div class="text-tool-footer identity-counter"><span id="identity-bio-count">0 / 500 caractères</span><span id="identity-link-count">0 lien</span></div>
+              <div class="identity-links-heading"><div><h3>Liens sociaux</h3><p>Ajoute ton profil ou ton site officiel.</p></div><button class="button button-secondary" type="button" id="identity-add-link">+ Ajouter un lien</button></div>
+              <div id="identity-links" class="identity-links" aria-live="polite"></div>
+              <p class="field-help">Utilise des adresses HTTPS complètes. Vérifie chaque adresse avant de partager ou d'exporter ta fiche.</p>
+              <div class="identity-actions">
+                <button class="button button-primary" type="submit" id="identity-save">Enregistrer sur cet appareil</button>
+                <button class="button button-secondary" type="button" id="identity-export">Exporter JSON</button>
+                <button class="button button-secondary" type="button" id="identity-copy">Copier le résumé</button>
+                <button class="button button-danger" type="button" id="identity-reset">Effacer la fiche</button>
+              </div>
+              <p class="field-help identity-feedback" id="identity-feedback" role="status" aria-live="polite"></p>
+            </form>
+            <aside class="tool-card identity-preview-panel">
+              <div class="tool-card-heading"><div class="module-symbol symbol-blue" aria-hidden="true">◉</div><div><h2>Aperçu de ta fiche</h2><p>Prévisualisation locale avant partage.</p></div></div>
+              <div class="identity-preview" id="identity-preview">
+                <div class="identity-avatar" id="identity-preview-avatar" aria-hidden="true">N</div>
+                <p class="identity-preview-handle" id="identity-preview-handle">@tonpseudo</p>
+                <h3 id="identity-preview-name">Ton nom de créateur</h3>
+                <p class="identity-preview-tagline" id="identity-preview-tagline">Ta phrase courte apparaîtra ici.</p>
+                <p class="identity-preview-bio" id="identity-preview-bio">Ta présentation apparaîtra ici.</p>
+                <div class="identity-preview-links" id="identity-preview-links"><p class="identity-empty">Tes liens valides apparaîtront ici.</p></div>
+              </div>
+              <p class="field-help">L'aperçu n'est pas une page publique. L'export JSON permet de sauvegarder ou de transférer manuellement les données.</p>
+            </aside>
+          </div>
         </section>
       </main>
 
