@@ -49,7 +49,7 @@
     closeMobileMenu();
 
     if (options.updateHash !== false && window.location.hash !== "#" + viewName) {
-      window.history.replaceState(null, "", "#" + viewName);
+      window.history.pushState(null, "", "#" + viewName);
     }
     if (options.focus !== false) {
       const heading = target.querySelector("h1");
@@ -90,6 +90,14 @@
       if (event.key === "Escape") closeMobileMenu();
     });
   }
+
+  window.addEventListener("popstate", () => {
+    const requestedView = window.location.hash.slice(1);
+    showView(pageTitles[requestedView] ? requestedView : "overview", {
+      updateHash: false,
+      focus: false
+    });
+  });
 
   if (year) year.textContent = String(new Date().getFullYear());
 
