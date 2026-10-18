@@ -43,8 +43,20 @@ async function main() {
     assert.equal(await page.locator('[data-page="content"]').isVisible(), true);
     await page.locator("#content-text").fill("Bonjour les amis, voici une publication utile. Bonjour encore les amis.");
     await page.locator("#analyze-text-button").click();
-    assert.match(await page.locator("#text-result").innerText(), /Résultat de l'analyse/);
-    assert.match(await page.locator("#text-result").innerText(), /Hashtags/);
+    const textAnalysis = await page.locator("#text-result").innerText();
+    assert.match(textAnalysis, /Analyse du texte/);
+    assert.match(textAnalysis, /Hashtags/);
+    assert.match(textAnalysis, /Mots uniques/);
+    assert.match(textAnalysis, /Conseils adaptés/);
+    assert.match(textAnalysis, /Conseil général/);
+    await page.locator("#content-platform").selectOption("instagram-post");
+    const instagramAnalysis = await page.locator("#text-result").innerText();
+    assert.match(instagramAnalysis, /Instagram/);
+    await page.locator("#content-text").fill("Pourquoi créer ? 🌟 Partage tes idées avec nous ! #Création #Création");
+    await page.locator("#analyze-text-button").click();
+    const focusedAnalysis = await page.locator("#text-result").innerText();
+    assert.match(focusedAnalysis, /Émojis détectés/);
+    assert.match(focusedAnalysis, /hashtag est répété/i);
     await page.locator("#image-file").setInputFiles({
       name: "not-an-image.txt", mimeType: "text/plain", buffer: Buffer.from("test")
     });
