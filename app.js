@@ -187,8 +187,8 @@
           advice.push("Pour un visuel vertical, garde le sujet et les textes importants au centre : les commandes et légendes de l'application peuvent masquer les zones proches des bords.");
         }
       }
-      if (/image\\/(jpeg|jpg)/i.test(file.type)) advice.push("JPEG convient souvent aux photos. Si l'image contient du texte fin, des contours nets ou de la transparence, compare le rendu avec un format mieux adapté avant l'export.");
-      if (/image\\/(png|webp|avif)/i.test(file.type)) advice.push("Vérifie que le format et la compression préservent les détails et, si nécessaire, la transparence. Le format déclaré ne suffit pas à juger la qualité visuelle.");
+      if (file.type.startsWith("image/jpeg") || file.type.startsWith("image/jpg")) advice.push("JPEG convient souvent aux photos. Si l'image contient du texte fin, des contours nets ou de la transparence, compare le rendu avec un format mieux adapté avant l'export.");
+      if (["image/png", "image/webp", "image/avif"].includes(file.type.toLowerCase())) advice.push("Vérifie que le format et la compression préservent les détails et, si nécessaire, la transparence. Le format déclaré ne suffit pas à juger la qualité visuelle.");
       advice.push("Vérification visuelle à faire : le sujet doit être immédiatement identifiable, le contraste suffisant et tout texte intégré à l'image lisible sur un petit écran. Réduis les éléments décoratifs si le message principal se perd.");
       advice.push("Si l'image transmet une information importante, ajoute une description accessible à la publication. Cette analyse mesure les propriétés du fichier ; elle ne comprend pas la scène représentée.");
       imageResult.innerHTML = "<h3>Analyse technique de l'image</h3>" + renderMetrics([
