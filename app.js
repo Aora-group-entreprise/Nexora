@@ -362,44 +362,110 @@
   };
 
   const bridgeWords = (value) => value.trim() ? getWords(value.trim()).length : 0;
+  const bridgeLanguageNames = { fr: "français", en: "anglais", mg: "malagasy" };
+  const bridgeExamples = {
+    fr: { cta: "« Quelle partie aimerais-tu que je développe ensuite ? »", context: "« Voici le problème, puis la solution que j'ai testée… »" },
+    en: { cta: "“Which part would you like me to explain next?”", context: "“Here is the problem, followed by the solution I tested…”" },
+    mg: { cta: "“Inona no tianao hazavaiko bebe kokoa amin’ny manaraka?”", context: "“Ity ny olana, ary ity ny vahaolana nosedraiko…”" }
+  };
+
   if (bridgeText && bridgeCount) {
     const updateBridgeCount = () => {
-      bridgeCount.textContent = bridgeText.value.length + " caractère" + (bridgeText.value.length === 1 ? "" : "s") + " · " + bridgeWords(bridgeText.value) + " mot" + (bridgeWords(bridgeText.value) === 1 ? "" : "s");
+      const words = bridgeWords(bridgeText.value);
+      bridgeCount.textContent = bridgeText.value.length + " caractère" + (bridgeText.value.length === 1 ? "" : "s") + " · " + words + " mot" + (words === 1 ? "" : "s");
     };
     bridgeText.addEventListener("input", updateBridgeCount);
     updateBridgeCount();
   }
 
+  function normalizeBridgeText(value) {
+    return value.normalize ? value.normalize("NFC") : value;
+  }
+
+  function buildBridgeAdvice(original, tone, language) {
+    const advice = [];
+    const trimmed = original.trim();
+    const words = getWords(trimmed);
+    const paragraphs = trimmed.split(/\n\s*\n/).filter((part) => part.trim());
+    const firstLine = (trimmed.split(/\r?\n/)[0] || trimmed).trim();
+    const firstLineWords = getWords(firstLine);
+    const hasAction = /\b(comment|commente|partage|enregistre|sauvegarde|abonne|abonne-toi|suis-moi|clique|découvre|dis-moi|réponds|follow|share|save|subscribe|tell me|let me know|contact|zarao|araho|lazao|valio|soraty)\b/i.test(trimmed);
+    const hasQuestion = /[?？]/.test(trimmed);
+    const examples = bridgeExamples[language] || bridgeExamples.fr;
+
+    if (words.length < 8) {
+      advice.push("Le message est très court. Si le public ne connaît pas le sujet, ajoute le contexte ou le bénéfice principal en une phrase.");
+    }
+    if (firstLineWords.length > 14 || firstLine.length > 100) {
+      advice.push("Rends la première ligne plus directe : annonce le sujet ou le bénéfice avant les détails.");
+    }
+    if (words.length > 70 && paragraphs.length < 2) {
+      advice.push("Le texte est assez long et forme un seul bloc. Sépare-le en petits paragraphes pour faciliter la lecture sur téléphone.");
+    }
+    if (trimmed.split(/[.!?…]+/).some((sentence) => getWords(sentence).length > 28)) {
+      advice.push("Une ou plusieurs phrases sont longues. Coupe-les en phrases plus courtes, avec une seule idée principale par phrase.");
+    }
+    if (!hasAction && !hasQuestion) {
+      advice.push("Si tu souhaites une réaction, termine par une invitation simple et précise. Exemple : " + examples.cta);
+    }
+    if (/(!!{2,}|\?{2,}|\.{4,})/.test(trimmed)) {
+      advice.push("Réduis les suites de ponctuation répétée pour donner un ton plus naturel et plus facile à lire.");
+    }
+    if (/\b(incroyable|secret|garanti|miracle|100%|viral|guaranteed|miracle|viral)\b/i.test(trimmed)) {
+      advice.push("Vérifie que les promesses fortes sont exactes et démontrées par le contenu ; préfère une formulation précise plutôt qu'une promesse exagérée.");
+    }
+    if (tone === "professional" && /[😀-🙏✨🔥💯]/u.test(trimmed)) {
+      advice.push("Pour un ton professionnel, vérifie si les émojis servent vraiment le message ; retire ceux qui détournent l'attention.");
+    }
+    if (!advice.length) {
+      advice.push("Le texte est déjà assez concis selon ces contrôles simples. Vérifie encore qu'il est exact, adapté à ton public et fidèle à ton intention.");
+    }
+    advice.push("Pour rendre le message plus concret, précise si possible un exemple, une preuve ou une étape réellement montrée. Exemple de structure : " + examples.context);
+    return advice;
+  }
+
   if (bridgeRewriteButton && bridgeText && bridgeResult && bridgeTone && bridgeCopyButton) {
     bridgeRewriteButton.addEventListener("click", () => {
-      const original = bridgeText.value.trim().replace(/[ \t]+/g, " ").replace(/\s*([,;:!?])\s*/g, "$1 ").replace(/\s+([.])/g, "$1").trim();
+      const language = bridgeSourceLanguage ? bridgeSourceLanguage.value : "fr";
+      const raw = normalizeBridgeText(bridgeText.value).replace(/\r\n?/g, "\n");
+      const original = raw.split("\n").map((line) => line.replace(/[\t ]+/g, " ").replace(/[ \t]+([,;:!?])/g, "$1").replace(/([,;:!?])(?=\S)/g, "$1 ")).join("\n").replace(/\n{3,}/g, "\n\n").trim();
       if (!original) {
         bridgeResult.dataset.result = "";
+        bridgeResult.dataset.advice = "";
         bridgeResult.innerHTML = '<p class="result-error">Écris ou colle un texte avant de continuer.</p>';
         bridgeCopyButton.disabled = true;
         return;
       }
+
       const tone = bridgeTone.value;
-      const language = bridgeSourceLanguage ? bridgeSourceLanguage.value : "fr";
       let result = original;
+      // Normalize sentence starts without rewriting the user's vocabulary or claims.
+      result = result.replace(/(^|[.!?…]\s+)([a-zà-öø-ÿ])/g, (match, prefix, letter) => prefix + letter.toLocaleUpperCase(language));
+      result = result.replace(/([.!?…]){2,}/g, (punctuation) => punctuation.includes("?") ? "?" : punctuation.includes("!") ? "!" : "…");
       if (!/[.!?…]$/.test(result)) result += ".";
-      if (tone === "clear") {
-        result = result.charAt(0).toLocaleUpperCase() + result.slice(1);
-      } else if (tone === "friendly") {
-        const greeting = ({fr:"Salut !",en:"Hey!",mg:"Salama!"})[language];
-        result = greeting + " " + result + " 🙂";
+
+      if (tone === "friendly") {
+        const greeting = ({ fr: "Salut !", en: "Hey!", mg: "Salama!" })[language] || "Salut !";
+        result = greeting + " " + result;
       } else if (tone === "professional") {
-        const greeting = ({fr:"Bonjour,",en:"Hello,",mg:"Miarahaba,"})[language];
-        const closing = ({fr:"Merci pour votre attention.",en:"Thank you for your attention.",mg:"Misaotra tamin'ny fiheverana."})[language];
-        result = greeting + " " + result.charAt(0).toLocaleLowerCase() + result.slice(1) + " " + closing;
+        const greeting = ({ fr: "Bonjour,", en: "Hello,", mg: "Miarahaba," })[language] || "Bonjour,";
+        const closing = ({ fr: "Merci pour votre attention.", en: "Thank you for your time.", mg: "Misaotra tamin'ny fotoananao." })[language] || "Merci pour votre attention.";
+        result = greeting + " " + result.charAt(0).toLocaleLowerCase(language) + result.slice(1) + " " + closing;
       } else if (tone === "engaging") {
-        const prompt = ({fr:"Qu'en penses-tu ?",en:"What do you think?",mg:"Ahoana ny hevitrao?"})[language];
-        result = "✨ " + result + " " + prompt;
+        const prompt = ({ fr: "Qu'en penses-tu ?", en: "What do you think?", mg: "Ahoana ny hevitrao?" })[language] || "Qu'en penses-tu ?";
+        result = result + " " + prompt;
       }
+
+      const advice = buildBridgeAdvice(original, tone, language);
       bridgeResult.dataset.result = result;
-      bridgeResult.innerHTML = "<h3>Proposition locale</h3><p>" + escapeHtml(result).replace(/\n/g, "<br>") + "</p><p class=\"field-help\">Suggestion fondée sur des règles de mise en forme ; le sens et l'adaptation culturelle doivent être vérifiés par toi.</p>";
+      bridgeResult.dataset.advice = JSON.stringify(advice);
+      bridgeResult.innerHTML =
+        "<h3>Proposition locale</h3><p class=\"bridge-rewrite-output\">" + escapeHtml(result).replace(/\n/g, "<br>") + "</p>" +
+        "<h3>Conseils pour améliorer ce message</h3><ul>" + advice.map((item) => "<li>" + escapeHtml(item) + "</li>").join("") + "</ul>" +
+        '<p class="field-help">Nexora corrige ici surtout la présentation et applique des modèles de ton. Il ne comprend pas entièrement le contexte, ne vérifie pas les faits et ne traduit pas le texte libre. Relis le résultat avant de le publier.</p>';
       bridgeCopyButton.disabled = false;
     });
+
     bridgeCopyButton.addEventListener("click", async () => {
       const result = bridgeResult.dataset.result || "";
       if (!result) return;
@@ -434,7 +500,7 @@
         bridgePhraseResult.innerHTML = '<p class="result-error">Cette expression n’est pas disponible dans cette langue.</p>';
         return;
       }
-      bridgePhraseResult.innerHTML = "<h3>Expression proposée</h3><p>" + escapeHtml(item[language]) + "</p><p class=\"field-help\">Phrase prédéfinie · " + escapeHtml(({fr:"Français",en:"English",mg:"Malagasy"})[language] || language) + "</p>";
+      bridgePhraseResult.innerHTML = "<h3>Expression proposée</h3><p>" + escapeHtml(item[language]) + "</p><p class=\"field-help\">Phrase prédéfinie · " + escapeHtml(({ fr: "Français", en: "English", mg: "Malagasy" })[language] || language) + "</p>";
     });
   }
 
