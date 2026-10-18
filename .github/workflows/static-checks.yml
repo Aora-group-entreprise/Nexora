@@ -28,3 +28,9 @@ jobs:
         run: node --check app.js
       - name: Run static application smoke checks
         run: python scripts/verify-static.py
+      - name: Install Playwright and Chromium
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Run real-browser smoke tests
+        run: node tests/browser-smoke.cjs
