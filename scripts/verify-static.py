@@ -15,11 +15,14 @@ class AppMarkupParser(HTMLParser):
         self.local_assets = []
         self.view_targets = []
         self.page_names = []
+        self.nav_controls = []
         self.has_main = False
         self.has_viewport = False
 
     def handle_starttag(self, tag, attrs):
         attrs = dict(attrs)
+        if tag == "button" and "nav-item" in attrs.get("class", "").split():
+            self.nav_controls.append(attrs)
         if "id" in attrs:
             self.ids.append(attrs["id"])
         if tag == "main":
@@ -60,6 +63,10 @@ def main():
         errors.append("missing main landmark")
     if not parser.has_viewport:
         errors.append("missing responsive viewport meta tag")
+    if "sidebar-overlay" not in parser.ids:
+        errors.append("missing mobile navigation overlay")
+    if not parser.nav_controls or any(not item.get("aria-label") for item in parser.nav_controls):
+        errors.append("every icon-capable navigation button must have an accessible aria-label")
 
     page_names = set(parser.page_names)
     if not page_names:
@@ -85,6 +92,10 @@ def main():
         css_text = styles_css.read_text(encoding="utf-8")
         if css_text.count("{") != css_text.count("}"):
             errors.append("styles.css has an unmatched brace count")
+        if "@media (max-width: 760px)" not in css_text:
+            errors.append("missing mobile layout breakpoint at 760px")
+        if ".sidebar-overlay:not([hidden])" not in css_text:
+            errors.append("mobile navigation overlay has no visible-state styling")
 
     if errors:
         for error in errors:
@@ -95,6 +106,8 @@ def main():
     print(f"PASS: {len(page_names)} views and {len(set(parser.view_targets))} navigation targets are connected")
     print(f"PASS: {len(parser.ids)} HTML ids are unique")
     print("PASS: responsive viewport and main landmark are present")
+    print(f"PASS: {len(parser.nav_controls)} navigation buttons have accessible labels")
+    print("PASS: mobile navigation overlay and 760px layout breakpoint are present")
     print("PASS: local asset paths and CSS brace counts are valid")
     return 0
 
