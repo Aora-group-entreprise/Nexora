@@ -128,8 +128,6 @@ def main():
         for feature in ("identityStorageKey", "identityValidUrl", "identityCreateLinkRow", "identityUpdatePreview", "identityDownloadJson", "identityCopyText", "localStorage.setItem", "identity-import-file"):
             if feature not in js_text:
                 errors.append("Digital Identity implementation missing: " + feature)
-        if "http:" in js_text and "identityValidUrl" in js_text:
-            pass
         if any(network_api in js_text for network_api in ("fetch(", "XMLHttpRequest", "sendBeacon(")):
             errors.append("unexpected network API found in client-side analysis code")
 
