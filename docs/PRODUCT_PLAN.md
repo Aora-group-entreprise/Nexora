@@ -90,7 +90,7 @@ Limite technique : une application purement statique ne fournit pas à elle seul
 - [x] mini phrasebook de 10 expressions prédéfinies en français, anglais et malagasy ;
 - [x] copie du résultat avec solution de repli pour les navigateurs plus anciens ;
 - [x] limites clairement annoncées : pas de traduction libre ni de prétendue IA ;
-- [ ] vérifier manuellement la reformulation, les expressions et la copie dans de vrais navigateurs ;
+- [x] vérification manuelle confirmée par le propriétaire sur le site publié ;
 - [ ] faire relire les traductions du phrasebook par des locuteurs compétents avant lancement public.
 
 ### Phase 4 — Digital Identity
@@ -102,7 +102,7 @@ Limite technique : une application purement statique ne fournit pas à elle seul
 - [x] export JSON, import JSON avec contrôle de structure et copie du résumé ;
 - [x] effacement local avec confirmation ;
 - [x] interface responsive et états de validation/erreur ;
-- [ ] tester manuellement le parcours complet dans de vrais navigateurs et sur plusieurs tailles d'écran ;
+- [x] parcours manuel confirmé par le propriétaire sur le site publié : création, sauvegarde et rechargement du profil ;
 - [ ] décider séparément d'une architecture si des pages publiques persistantes partageables deviennent nécessaires.
 
 ### Phase 5 — Qualité et déploiement
@@ -110,13 +110,13 @@ Limite technique : une application purement statique ne fournit pas à elle seul
 - [x] contrôles de régression pour la navigation avec l'historique, les liens externes sécurisés et les limites de la fiche Digital Identity ;
 - [x] correction de la validation des longueurs de profil et du message affiché si l'effacement du stockage local échoue ;
 - [x] ajout de tests de fumée Playwright couvrant navigation, analyse de texte, refus de fichiers invalides, Cultural Bridge, sauvegarde/chargement Digital Identity et menu mobile ;
-- [ ] confirmer le résultat du workflow navigateur après son exécution ;
-- [ ] tests fonctionnels manuels sur de vrais navigateurs et appareils ;
-- [ ] contrôle de la console et des erreurs dans un navigateur ;
-- [ ] vérification responsive sur téléphone, tablette et ordinateur ;
-- [ ] vérification de confidentialité des fichiers et du chargement sur connexion lente ;
-- [ ] configuration de Cloudflare Pages ;
-- [ ] test du déploiement publié.
+- [x] workflow GitHub Actions confirmé : syntaxe, vérifications statiques, configuration de déploiement et tests Playwright Chromium réussis ;
+- [x] tests fonctionnels manuels confirmés par le propriétaire sur téléphone : navigation, Content Intelligence, Cultural Bridge et Digital Identity ;
+- [x] vérification responsive mobile confirmée par le propriétaire ;
+- [x] publication Cloudflare Pages effectuée ;
+- [x] URL publique vérifiée manuellement par le propriétaire : https://nexora-49m.pages.dev/ ;
+- [ ] test manuel détaillé sur ordinateur/tablette et connexion lente ;
+- [ ] audit indépendant des en-têtes HTTP et des requêtes réseau sur le site publié ;
 
 ### Phase 6 — Validation et monétisation
 - obtenir des retours d'utilisateurs réels ;
@@ -128,11 +128,12 @@ Limite technique : une application purement statique ne fournit pas à elle seul
 - [x] documenter la configuration statique sans framework ni dépendance de build ;
 - [x] préparer les en-têtes HTTP de sécurité dans `_headers` ;
 - [x] ajouter une vérification automatisée de la configuration de déploiement ;
-- [ ] confirmer le workflow CI mis à jour ;
-- [ ] configurer le projet Cloudflare Pages depuis le tableau de bord ;
-- [ ] tester l'URL publique sur ordinateur et téléphone avant de déclarer le lancement prêt.
+- [x] confirmer le workflow CI mis à jour ;
+- [x] configurer et publier le projet Cloudflare Pages ;
+- [x] test de l'URL publique sur téléphone confirmé par le propriétaire ;
+- [ ] tester également l'URL publique sur ordinateur/tablette et vérifier les en-têtes HTTP.
 
-Détails pratiques : [guide de déploiement](DEPLOYMENT.md). L'étape de publication réelle nécessite l'accès au compte Cloudflare du propriétaire ; elle n'est pas considérée comme faite tant que l'URL publiée n'a pas été vérifiée.
+Détails pratiques : [guide de déploiement](DEPLOYMENT.md). Le site est publié sur https://nexora-49m.pages.dev/ ; le propriétaire a confirmé que les cinq vérifications manuelles prévues sur téléphone sont réussies.
 
 ## 5. Critères d'acceptation du MVP
 
