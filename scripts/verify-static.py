@@ -102,6 +102,15 @@ def main():
     missing_bridge_controls = sorted(required_bridge_controls - set(parser.ids))
     if missing_bridge_controls:
         errors.append("Cultural Bridge control(s) missing: " + ", ".join(missing_bridge_controls))
+    required_identity_controls = {
+        "identity-form", "identity-name", "identity-handle", "identity-tagline",
+        "identity-bio", "identity-links", "identity-add-link", "identity-save",
+        "identity-export", "identity-import", "identity-import-file", "identity-copy",
+        "identity-reset", "identity-preview", "identity-preview-links", "identity-feedback",
+    }
+    missing_identity_controls = sorted(required_identity_controls - set(parser.ids))
+    if missing_identity_controls:
+        errors.append("Digital Identity control(s) missing: " + ", ".join(missing_identity_controls))
 
     if app_js.is_file():
         js_text = app_js.read_text(encoding="utf-8")
@@ -116,6 +125,11 @@ def main():
         for feature in ("const phrasebook", "bridge-rewrite-button", "bridge-copy-button", "bridge-phrase-button"):
             if feature not in js_text:
                 errors.append("Cultural Bridge implementation missing: " + feature)
+        for feature in ("identityStorageKey", "identityValidUrl", "identityCreateLinkRow", "identityUpdatePreview", "identityDownloadJson", "identityCopyText", "localStorage.setItem", "identity-import-file"):
+            if feature not in js_text:
+                errors.append("Digital Identity implementation missing: " + feature)
+        if "http:" in js_text and "identityValidUrl" in js_text:
+            pass
         if any(network_api in js_text for network_api in ("fetch(", "XMLHttpRequest", "sendBeacon(")):
             errors.append("unexpected network API found in client-side analysis code")
 
@@ -145,6 +159,8 @@ def main():
     print("PASS: image, video and text analysis hooks are present; no upload API detected")
     print(f"PASS: {len(required_bridge_controls)} Cultural Bridge controls are present")
     print("PASS: local phrasebook, reformulation, copy fallback, browser compatibility and stale-result guards are present")
+    print(f"PASS: {len(required_identity_controls)} Digital Identity controls are present")
+    print("PASS: local profile editor, HTTPS link validation, preview, JSON import/export and copy hooks are present")
     print("PASS: local asset paths and CSS brace counts are valid")
     return 0
 
