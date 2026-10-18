@@ -94,7 +94,7 @@ async function main() {
       name: "sample.webm", mimeType: "video/webm", buffer: Buffer.from("synthetic test fixture")
     });
     await page.locator("#video-file").dispatchEvent("change");
-    await page.locator("video").waitFor();
+    await page.locator("video").waitFor({ state: "attached" });
     await page.evaluate(() => {
       document.querySelector("video").dispatchEvent(new Event("loadedmetadata"));
     });
