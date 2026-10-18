@@ -501,11 +501,14 @@
   };
   const identityValidate = (data) => {
     if (!data.name) return "Ajoute un nom affiché avant d'enregistrer.";
+    if (data.name.length > 60) return "Le nom affiché ne doit pas dépasser 60 caractères.";
     if (data.handle && !/^[A-Za-z0-9._-]{1,30}$/.test(data.handle)) return "Le nom d'utilisateur contient des caractères non autorisés.";
+    if (data.tagline.length > 100) return "La phrase courte ne doit pas dépasser 100 caractères.";
+    if (data.bio.length > 500) return "La présentation ne doit pas dépasser 500 caractères.";
     if (data.links.length > 20) return "Tu peux ajouter au maximum 20 liens.";
     for (let i = 0; i < data.links.length; i += 1) {
       if (!identityPlatforms.some((item) => item[0] === data.links[i].platform)) return "Une plateforme sélectionnée n'est pas reconnue.";
-      if (!identityValidUrl(data.links[i].url)) return "Le lien " + (i + 1) + " doit être une adresse HTTPS valide.";
+      if (data.links[i].url.length > 2048 || !identityValidUrl(data.links[i].url)) return "Le lien " + (i + 1) + " doit être une adresse HTTPS valide de 2048 caractères maximum.";
     }
     return "";
   };
@@ -621,7 +624,12 @@
     }
     if (identityReset) identityReset.addEventListener("click", () => {
       if (!window.confirm("Effacer la fiche enregistrée sur cet appareil et vider l'éditeur ? Pense à exporter une sauvegarde si tu souhaites la garder.")) return;
-      try { localStorage.removeItem(identityStorageKey); } catch (_) {}
+      try {
+        localStorage.removeItem(identityStorageKey);
+      } catch (_) {
+        identitySetFeedback("Impossible d'effacer la fiche enregistrée : le stockage local est indisponible.", true);
+        return;
+      }
       identityFillForm({ name: "", handle: "", tagline: "", bio: "", links: [] });
       identitySetFeedback("La fiche locale a été effacée.", false);
     });
