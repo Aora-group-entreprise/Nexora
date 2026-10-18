@@ -64,6 +64,19 @@ async function main() {
       name: "not-an-image.txt", mimeType: "text/plain", buffer: Buffer.from("test")
     });
     assert.match(await page.locator("#image-result").innerText(), /pas reconnu comme une image/);
+    await page.locator("#content-platform").selectOption("instagram-post");
+    await page.locator("#image-file").setInputFiles({
+      name: "sample.svg",
+      mimeType: "image/svg+xml",
+      buffer: Buffer.from('<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1200"><rect width="1200" height="1200" fill="#ffffff"/><text x="100" y="600">Test image</text></svg>')
+    });
+    await page.locator("#image-result").getByText("Analyse technique de l'image").waitFor();
+    const imageAnalysis = await page.locator("#image-result").innerText();
+    assert.match(imageAnalysis, /Dimensions/);
+    assert.match(imageAnalysis, /Poids/);
+    assert.match(imageAnalysis, /Conseils pour améliorer le visuel/);
+    assert.match(imageAnalysis, /aperçu du fil|Vérification visuelle/i);
+
     await page.locator("#video-file").setInputFiles({
       name: "not-a-video.txt", mimeType: "text/plain", buffer: Buffer.from("test")
     });
