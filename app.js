@@ -105,6 +105,128 @@
     });
   }
 
+
+  // Local-first Content Intelligence: files are never uploaded.
+  const platformSelect = document.getElementById("content-platform");
+  const imageInput = document.getElementById("image-file");
+  const videoInput = document.getElementById("video-file");
+  const imageResult = document.getElementById("image-result");
+  const videoResult = document.getElementById("video-result");
+  const textInput = document.getElementById("content-text");
+  const textCount = document.getElementById("text-count");
+  const textResult = document.getElementById("text-result");
+  const analyzeTextButton = document.getElementById("analyze-text-button");
+  const MAX_FILE_BYTES = 20 * 1024 * 1024;
+  const formatBytes = (bytes) => bytes < 1024 ? bytes + " o" : bytes < 1048576 ? (bytes / 1024).toFixed(1) + " Ko" : (bytes / 1048576).toFixed(2) + " Mo";
+  const formatDuration = (seconds) => {
+    if (!Number.isFinite(seconds) || seconds < 0) return "Indisponible";
+    const total = Math.floor(seconds), hours = Math.floor(total / 3600), minutes = Math.floor((total % 3600) / 60), secs = total % 60;
+    return hours ? hours + " h " + minutes + " min " + secs + " s" : minutes + " min " + secs + " s";
+  };
+  const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (char) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
+  const getTarget = () => ({
+    "instagram-post": {label:"Instagram — publication carrée",width:1080,height:1080},
+    "instagram-reel": {label:"Instagram — Reel vertical",width:1080,height:1920},
+    tiktok: {label:"TikTok — vidéo verticale",width:1080,height:1920},
+    youtube: {label:"YouTube — vidéo classique",width:1920,height:1080},
+    "youtube-thumb": {label:"YouTube — miniature",width:1280,height:720}
+  }[platformSelect ? platformSelect.value : "general"] || null);
+  const renderMetrics = (metrics) => '<div class="result-metrics">' + metrics.map((m) => '<div class="result-metric"><strong>' + escapeHtml(m.value) + '</strong><span>' + escapeHtml(m.label) + '</span></div>').join("") + "</div>";
+  const renderAdvice = (items) => items.length ? "<h3>Points à vérifier</h3><ul>" + items.map((item) => "<li>" + escapeHtml(item) + "</li>").join("") + "</ul>" : "<p>Les vérifications de base ne signalent rien de particulier pour ce format.</p>";
+  const showError = (element, message) => { if (element) element.innerHTML = '<p class="result-error">' + escapeHtml(message) + "</p>"; };
+
+  function analyzeImage(file) {
+    if (!imageResult) return;
+    if (!file) { imageResult.textContent = "Choisis une image pour afficher ses informations."; return; }
+    if (!file.type.startsWith("image/")) { showError(imageResult, "Ce fichier n'est pas reconnu comme une image."); return; }
+    if (file.size > MAX_FILE_BYTES) { showError(imageResult, "Le fichier dépasse la limite de 20 Mo. Choisis une image plus légère."); return; }
+    imageResult.textContent = "Analyse de l'image…";
+    const url = URL.createObjectURL(file), image = new Image();
+    image.onload = () => {
+      URL.revokeObjectURL(url);
+      const width = image.naturalWidth, height = image.naturalHeight, ratio = width / height, target = getTarget(), advice = [];
+      if (width < 720 || height < 720) advice.push("L'image est relativement petite ; vérifie sa netteté dans le format choisi.");
+      if (target) {
+        if (Math.abs(ratio - target.width / target.height) / (target.width / target.height) > .05) advice.push("Le ratio diffère du repère cible " + target.width + " × " + target.height + " px ; un recadrage peut être nécessaire.");
+        if (width < target.width || height < target.height) advice.push("La résolution est inférieure au repère cible de " + target.width + " × " + target.height + " px.");
+      }
+      imageResult.innerHTML = "<h3>Résultat de l'analyse</h3>" + renderMetrics([
+        {label:"Dimensions",value:width+" × "+height+" px"},{label:"Poids",value:formatBytes(file.size)},
+        {label:"Format",value:file.type||"Non précisé"},{label:"Ratio",value:ratio.toFixed(2)+":1"}
+      ]) + renderAdvice(advice);
+    };
+    image.onerror = () => { URL.revokeObjectURL(url); showError(imageResult, "Le navigateur n'a pas pu lire cette image. Essaie un autre format."); };
+    image.src = url;
+  }
+
+  function analyzeVideo(file) {
+    if (!videoResult) return;
+    if (!file) { videoResult.textContent = "Choisis une vidéo pour lire ses métadonnées."; return; }
+    if (!file.type.startsWith("video/")) { showError(videoResult, "Ce fichier n'est pas reconnu comme une vidéo."); return; }
+    if (file.size > MAX_FILE_BYTES) { showError(videoResult, "Le fichier dépasse la limite de 20 Mo pour préserver les ressources des téléphones."); return; }
+    videoResult.textContent = "Lecture des métadonnées vidéo…";
+    const url = URL.createObjectURL(file), video = document.createElement("video");
+    video.preload = "metadata";
+    const cleanup = () => { URL.revokeObjectURL(url); video.removeAttribute("src"); video.load(); };
+    video.onloadedmetadata = () => {
+      const width = video.videoWidth, height = video.videoHeight, target = getTarget(), advice = [];
+      if (target && width && height) {
+        const ratio = width / height, targetRatio = target.width / target.height;
+        if (Math.abs(ratio - targetRatio) / targetRatio > .05) advice.push("Le ratio diffère du repère cible " + target.width + " × " + target.height + " px.");
+        if (width < target.width || height < target.height) advice.push("La résolution est inférieure au repère cible.");
+      }
+      videoResult.innerHTML = "<h3>Résultat des métadonnées</h3>" + renderMetrics([
+        {label:"Dimensions",value:width&&height?width+" × "+height+" px":"Indisponibles"},
+        {label:"Durée",value:formatDuration(video.duration)},{label:"Poids",value:formatBytes(file.size)},{label:"Format déclaré",value:file.type||"Non précisé"}
+      ]) + renderAdvice(advice);
+      cleanup();
+    };
+    video.onerror = () => { cleanup(); showError(videoResult, "Impossible de lire les métadonnées de ce format dans ce navigateur."); };
+    video.src = url;
+  }
+
+  function analyzeText() {
+    if (!textInput || !textResult) return;
+    const value = textInput.value.trim();
+    if (!value) { textResult.dataset.analyzed = "false"; showError(textResult, "Saisis un texte avant de lancer l'analyse."); return; }
+    const words = value.match(/[\p{L}\p{N}]+(?:['’][\p{L}]+)*/gu) || [];
+    const hashtags = value.match(/#[\p{L}\p{N}_]+/gu) || [];
+    const mentions = value.match(/@[\p{L}\p{N}_.]+/gu) || [];
+    const sentences = value.split(/[.!?…]+/).map((s) => s.trim()).filter(Boolean);
+    const stop = new Set(["avec","dans","pour","mais","donc","alors","cette","cela","vous","nous","votre","the","and","for","that","this","with","from","have","your"]);
+    const counts = new Map();
+    words.forEach((word) => { const key = word.toLocaleLowerCase(); if (key.length > 3 && !stop.has(key)) counts.set(key,(counts.get(key)||0)+1); });
+    const repeated = Array.from(counts.entries()).filter((entry)=>entry[1]>=3).sort((a,b)=>b[1]-a[1]).slice(0,5);
+    const advice = [];
+    if (value.length > 2200) advice.push("Le texte est long ("+value.length+" caractères) ; vérifie la limite de la plateforme choisie.");
+    if (words.length < 5) advice.push("Le texte est très court ; ajoute du contexte si ton public en a besoin.");
+    if (sentences.some((s)=>(s.match(/[\p{L}\p{N}]+/gu)||[]).length>30)) advice.push("Au moins une phrase est longue ; essaie de la raccourcir.");
+    if (repeated.length) advice.push("Mots répétés : "+repeated.map((entry)=>entry[0]+" ("+entry[1]+" fois)").join(", ")+".");
+    if (hashtags.length > 10) advice.push("Le texte contient "+hashtags.length+" hashtags ; garde ceux qui sont pertinents.");
+    if (value.length > 500 && sentences.length < 2) advice.push("Pense à séparer le texte en phrases ou paragraphes plus courts.");
+    textResult.dataset.analyzed = "true";
+    textResult.innerHTML = "<h3>Résultat de l'analyse</h3>" + renderMetrics([
+      {label:"Caractères",value:String(value.length)},{label:"Mots",value:String(words.length)},
+      {label:"Hashtags",value:String(hashtags.length)},{label:"Mentions",value:String(mentions.length)},
+      {label:"Phrases détectées",value:String(sentences.length)},{label:"Mots moyens par phrase",value:sentences.length?(words.length/sentences.length).toFixed(1):"0"}
+    ]) + renderAdvice(advice);
+  }
+  if (imageInput) imageInput.addEventListener("change", () => analyzeImage(imageInput.files && imageInput.files[0]));
+  if (videoInput) videoInput.addEventListener("change", () => analyzeVideo(videoInput.files && videoInput.files[0]));
+  if (textInput && textCount) {
+    const updateCount = () => {
+      const value = textInput.value, words = value.trim() ? (value.trim().match(/[\p{L}\p{N}]+(?:['’][\p{L}]+)*/gu)||[]).length : 0;
+      textCount.textContent = value.length+" caractère"+(value.length===1?"":"s")+" · "+words+" mot"+(words===1?"":"s");
+    };
+    textInput.addEventListener("input", updateCount); updateCount();
+  }
+  if (analyzeTextButton) analyzeTextButton.addEventListener("click", analyzeText);
+  if (platformSelect) platformSelect.addEventListener("change", () => {
+    if (imageInput && imageInput.files && imageInput.files[0]) analyzeImage(imageInput.files[0]);
+    if (videoInput && videoInput.files && videoInput.files[0]) analyzeVideo(videoInput.files[0]);
+    if (textResult && textResult.dataset.analyzed === "true") analyzeText();
+  });
+
   window.addEventListener("popstate", () => {
     const requestedView = window.location.hash.slice(1);
     showView(pageTitles[requestedView] ? requestedView : "overview", {
