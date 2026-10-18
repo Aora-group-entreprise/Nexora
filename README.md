@@ -26,11 +26,11 @@ Certaines fonctions avancées, comme une traduction IA fiable ou des pages de pr
 
 ## Plan de construction
 
-Lire [docs/PRODUCT_PLAN.md](docs/PRODUCT_PLAN.md) pour le positionnement, le périmètre du MVP, les phases de développement et les critères d'acceptation. Le contrôle local sans dépendances peut être lancé avec `python scripts/verify-static.py` ; la syntaxe JavaScript est vérifiée avec `node --check app.js`.
+Lire [docs/PRODUCT_PLAN.md](docs/PRODUCT_PLAN.md) pour le positionnement, le périmètre du MVP, les phases de développement et les critères d'acceptation. Les tests de fumée locaux sans dépendances peuvent être lancés avec `python scripts/verify-static.py` ; la syntaxe JavaScript est vérifiée avec `node --check app.js`.
 
 ## État du projet
 
-Le dépôt contient pour le moment le plan produit initial. Le code de l'application n'a pas encore été construit. La prochaine étape est de créer le squelette statique et l'interface responsive, puis d'implémenter et tester les modules progressivement.
+Le squelette statique initial est en place : interface responsive, navigation entre les vues, icône, styles et tests de fumée sans dépendances. Les trois vues de modules indiquent clairement qu'elles sont encore en construction ; elles ne prétendent pas fournir déjà les analyses, traductions ou pages publiques finales. Les fonctions métier seront implémentées et testées progressivement.
 
 ## Hébergement envisagé
 
