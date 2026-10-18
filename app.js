@@ -220,7 +220,7 @@
     const hashtags = value.match(HASHTAG_PATTERN) || [];
     const mentions = value.match(MENTION_PATTERN) || [];
     const sentences = value.split(/[.!?…]+/).map((sentence) => sentence.trim()).filter(Boolean);
-    const lines = value.split(/\\r?\\n/).map((line) => line.trim()).filter(Boolean);
+    const lines = value.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
     const lowerWords = words.map((word) => word.toLocaleLowerCase());
     const stop = new Set([
       "avec","dans","pour","mais","donc","alors","cette","cela","vous","nous","votre","plus","tout","tous","comme","sur","une","des","les","est","qui","que","aux","par",
@@ -239,11 +239,11 @@
     const averageSentenceLength = sentences.length ? words.length / sentences.length : words.length;
     const firstLine = lines[0] || value;
     const firstLineWords = getWords(firstLine);
-    const questionCount = (value.match(/\\?/g) || []).length;
+    const questionCount = (value.match(/\?/g) || []).length;
     const exclamationCount = (value.match(/!/g) || []).length;
-    const emojiCount = (value.match(/[\\u{1F300}-\\u{1FAFF}\\u{2600}-\\u{27BF}]/gu) || []).length;
-    const hasCallToAction = /\\b(comment|commente|partage|enregistre|sauvegarde|abonne|abonne-toi|suis-moi|clique|découvre|dis-moi|donne|réponds|follow|share|save|subscribe|comment below|tell me|check out|let me know|zarao|araho|lazao|valio|soraty)\\b/i.test(value);
-    const hasOpeningHook = /^(pourquoi|comment|voici|découvre|imagine|et si|tu savais|saviez-vous|le secret|3 |5 |7 |why|how|here('s| is)|discover|imagine|did you know|the secret|3 |5 |7 |fantatrao ve|ahoana|jereo|indro)\\b/i.test(firstLine);
+    const emojiCount = (value.match(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu) || []).length;
+    const hasCallToAction = /\b(comment|commente|partage|enregistre|sauvegarde|abonne|abonne-toi|suis-moi|clique|découvre|dis-moi|donne|réponds|follow|share|save|subscribe|comment below|tell me|check out|let me know|zarao|araho|lazao|valio|soraty)\b/i.test(value);
+    const hasOpeningHook = /^(pourquoi|comment|voici|découvre|imagine|et si|tu savais|saviez-vous|le secret|3 |5 |7 |why|how|here('s| is)|discover|imagine|did you know|the secret|3 |5 |7 |fantatrao ve|ahoana|jereo|indro)\b/i.test(firstLine);
     const platform = platformSelect ? platformSelect.value : "general";
     const advice = [];
 
