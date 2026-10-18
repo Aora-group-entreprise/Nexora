@@ -24,7 +24,7 @@ Le dossier publié doit contenir directement `index.html`, `styles.css`, `app.js
 3. Connecte GitHub et sélectionne `Aora-group-entreprise/Nexora`.
 4. Configure les paramètres du tableau ci-dessus, avec `main` comme branche de production.
 5. Lance le déploiement initial et attends la fin du build.
-6. Ouvre l'URL `*.pages.dev) indiquée par Cloudflare.
+6. Ouvre l'URL `https://<nom-du-projet>.pages.dev` indiquée par Cloudflare.
 
 **Important :** choisis l'intégration Git dès le départ. Cloudflare indique qu'un projet créé avec Git integration ne peut pas être converti ensuite en projet Direct Upload. Les prochains commits poussés sur `main` déclencheront normalement de nouveaux déploiements.
 
