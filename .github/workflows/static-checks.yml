@@ -26,6 +26,8 @@ jobs:
           node-version: "20"
       - name: Check JavaScript syntax
         run: node --check app.js
+      - name: Check browser test syntax
+        run: node --check tests/browser-smoke.cjs
       - name: Run static application smoke checks
         run: python scripts/verify-static.py
       - name: Install Playwright and Chromium
