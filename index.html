@@ -108,8 +108,40 @@
 
         <section class="view module-view" id="view-content" data-page="content" aria-labelledby="content-title" hidden>
           <div class="page-intro"><div class="eyebrow"><span class="eyebrow-line"></span> MODULE 01</div><h1 id="content-title">Content <span class="gradient-text">Intelligence</span></h1><p>Prépare tes médias et tes textes avant de les publier. Les premiers outils d'analyse sont en cours de construction.</p></div>
-          <div class="module-status-card"><div class="status-illustration status-blue" aria-hidden="true">◈</div><div><span class="status-label"><span class="status-dot"></span> PHASE DE CONSTRUCTION</span><h2>L'atelier de contenu arrive.</h2><p>Cette première version posera les bases pour vérifier les dimensions des images, lire les métadonnées vidéo prises en charge et analyser quelques caractéristiques des textes.</p><button class="button button-secondary" type="button" data-view="overview">Retour à la vue d'ensemble</button></div></div>
-          <div class="notice"><span aria-hidden="true">ⓘ</span><p>Les recommandations porteront sur des éléments vérifiables. Nexora ne prétendra pas prédire la viralité d'une publication.</p></div>
+          <div class="notice"><span aria-hidden="true">🔒</span><p><strong>Confidentialité :</strong> les fichiers sont analysés directement dans ton navigateur. Ils ne sont pas envoyés à un serveur. Limite par fichier : 20 Mo.</p></div>
+          <div class="tool-toolbar">
+            <label class="field-label" for="content-platform">Plateforme / format cible
+              <select id="content-platform" class="field-control">
+                <option value="general">Conseils généraux</option>
+                <option value="instagram-post">Instagram — publication carrée</option>
+                <option value="instagram-reel">Instagram — Reel vertical</option>
+                <option value="tiktok">TikTok — vidéo verticale</option>
+                <option value="youtube">YouTube — vidéo classique</option>
+                <option value="youtube-thumb">YouTube — miniature</option>
+              </select>
+            </label>
+            <p class="field-help">Les dimensions recommandées sont des repères pratiques, pas une garantie de performance.</p>
+          </div>
+          <div class="content-tools-grid">
+            <section class="tool-card" aria-labelledby="image-tool-title">
+              <div class="tool-card-heading"><span class="module-symbol symbol-blue" aria-hidden="true">▧</span><div><h2 id="image-tool-title">Analyser une image</h2><p>Format, poids, dimensions et ratio.</p></div></div>
+              <label class="upload-zone" for="image-file"><span class="upload-symbol" aria-hidden="true">＋</span><strong>Choisir une image</strong><span>JPG, PNG, GIF, WebP ou autre format lisible par le navigateur</span><input id="image-file" type="file" accept="image/*"></label>
+              <div id="image-result" class="analysis-result" role="status" aria-live="polite">Choisis une image pour afficher ses informations.</div>
+            </section>
+            <section class="tool-card" aria-labelledby="video-tool-title">
+              <div class="tool-card-heading"><span class="module-symbol symbol-purple" aria-hidden="true">▷</span><div><h2 id="video-tool-title">Analyser une vidéo</h2><p>Métadonnées disponibles dans le navigateur.</p></div></div>
+              <label class="upload-zone" for="video-file"><span class="upload-symbol" aria-hidden="true">＋</span><strong>Choisir une vidéo</strong><span>La lecture des métadonnées dépend du format et du navigateur.</span><input id="video-file" type="file" accept="video/*"></label>
+              <div id="video-result" class="analysis-result" role="status" aria-live="polite">Choisis une vidéo pour lire ses métadonnées.</div>
+            </section>
+            <section class="tool-card tool-card-wide" aria-labelledby="text-tool-title">
+              <div class="tool-card-heading"><span class="module-symbol symbol-green" aria-hidden="true">¶</span><div><h2 id="text-tool-title">Analyser un texte</h2><p>Longueur, hashtags, répétitions et conseils de lisibilité simples.</p></div></div>
+              <label class="field-label" for="content-text">Légende ou texte de publication</label>
+              <textarea id="content-text" class="field-control text-area" rows="6" maxlength="10000" placeholder="Colle ici ta légende ou ton texte…"></textarea>
+              <div class="text-tool-footer"><span id="text-count">0 caractère · 0 mot</span><button class="button button-primary" id="analyze-text-button" type="button">Analyser le texte</button></div>
+              <div id="text-result" class="analysis-result" role="status" aria-live="polite">Saisis un texte puis lance l'analyse.</div>
+            </section>
+          </div>
+          <div class="notice"><span aria-hidden="true">ⓘ</span><p>Les résultats reposent sur des métadonnées et des règles explicites. Nexora ne prédit pas la viralité et ne remplace pas les recommandations officielles de chaque plateforme.</p></div>
         </section>
 
         <section class="view module-view" id="view-cultural" data-page="cultural" aria-labelledby="cultural-title" hidden>
