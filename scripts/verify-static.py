@@ -128,6 +128,20 @@ def main():
         for feature in ("identityStorageKey", "identityValidUrl", "identityCreateLinkRow", "identityUpdatePreview", "identityDownloadJson", "identityCopyText", "localStorage.setItem", "identity-import-file"):
             if feature not in js_text:
                 errors.append("Digital Identity implementation missing: " + feature)
+        for feature in (
+            'window.addEventListener("popstate"',
+            'link.rel = "noopener noreferrer"',
+            'parsed.protocol === "https:"',
+            "data.name.length > 60",
+            "data.tagline.length > 100",
+            "data.bio.length > 500",
+            "data.links[i].url.length > 2048",
+            "Impossible d'effacer la fiche enregistrée",
+        ):
+            if feature not in js_text:
+                errors.append("navigation/security/validation regression check failed: " + feature)
+        if 'link.target = "_blank"' in js_text and 'link.rel = "noopener noreferrer"' not in js_text:
+            errors.append("external preview links must use noopener noreferrer")
         if any(network_api in js_text for network_api in ("fetch(", "XMLHttpRequest", "sendBeacon(")):
             errors.append("unexpected network API found in client-side analysis code")
 
@@ -159,6 +173,7 @@ def main():
     print("PASS: local phrasebook, reformulation, copy fallback, browser compatibility and stale-result guards are present")
     print(f"PASS: {len(required_identity_controls)} Digital Identity controls are present")
     print("PASS: local profile editor, HTTPS link validation, preview, JSON import/export and copy hooks are present")
+    print("PASS: browser-history navigation, safe external links, profile length limits and truthful reset errors are guarded")
     print("PASS: local asset paths and CSS brace counts are valid")
     return 0
 
