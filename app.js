@@ -353,6 +353,292 @@
     });
   }
 
+
+  // Digital Identity: local-first creator profile, validated social links and portable JSON backup.
+  const identityForm = document.getElementById("identity-form");
+  const identityName = document.getElementById("identity-name");
+  const identityHandle = document.getElementById("identity-handle");
+  const identityTagline = document.getElementById("identity-tagline");
+  const identityBio = document.getElementById("identity-bio");
+  const identityBioCount = document.getElementById("identity-bio-count");
+  const identityLinkCount = document.getElementById("identity-link-count");
+  const identityLinks = document.getElementById("identity-links");
+  const identityPreview = document.getElementById("identity-preview");
+  const identityFeedback = document.getElementById("identity-feedback");
+  const identityAddLink = document.getElementById("identity-add-link");
+  const identityExport = document.getElementById("identity-export");
+  const identityImport = document.getElementById("identity-import");
+  const identityImportFile = document.getElementById("identity-import-file");
+  const identityCopy = document.getElementById("identity-copy");
+  const identityReset = document.getElementById("identity-reset");
+  const identityStorageKey = "nexora.digitalIdentity.v1";
+  const identityPlatforms = [
+    ["instagram", "Instagram"], ["tiktok", "TikTok"], ["youtube", "YouTube"],
+    ["facebook", "Facebook"], ["x", "X"], ["twitch", "Twitch"],
+    ["linkedin", "LinkedIn"], ["website", "Site web"], ["other", "Autre"]
+  ];
+  let identityLinkSequence = 0;
+
+  const identitySetFeedback = (message, isError) => {
+    if (!identityFeedback) return;
+    identityFeedback.textContent = message;
+    identityFeedback.style.color = isError ? "#a62b40" : "";
+  };
+  const identityCurrentData = () => ({
+    version: 1,
+    name: identityName ? identityName.value.trim() : "",
+    handle: identityHandle ? identityHandle.value.trim().replace(/^@+/, "") : "",
+    tagline: identityTagline ? identityTagline.value.trim() : "",
+    bio: identityBio ? identityBio.value.trim() : "",
+    links: identityLinks ? Array.from(identityLinks.querySelectorAll(".identity-link-row")).map((row) => ({
+      platform: row.querySelector(".identity-platform").value,
+      url: row.querySelector(".identity-url").value.trim()
+    })) : []
+  });
+  const identityValidUrl = (value) => {
+    try {
+      const parsed = new URL(value);
+      return parsed.protocol === "https:" && Boolean(parsed.hostname) && !parsed.username && !parsed.password;
+    } catch (_) { return false; }
+  };
+  const identityPlatformLabel = (key) => {
+    const found = identityPlatforms.find((item) => item[0] === key);
+    return found ? found[1] : "Autre";
+  };
+  const identityCreateLinkRow = (platform, url) => {
+    if (!identityLinks) return;
+    const row = document.createElement("div");
+    row.className = "identity-link-row";
+    const platformWrap = document.createElement("div");
+    const platformLabel = document.createElement("label");
+    platformLabel.className = "field-label";
+    platformLabel.textContent = "Plateforme";
+    const platformId = "identity-platform-" + (++identityLinkSequence);
+    platformLabel.htmlFor = platformId;
+    const platformSelect = document.createElement("select");
+    platformSelect.className = "field-control identity-platform";
+    platformSelect.id = platformId;
+    identityPlatforms.forEach(([value, label]) => {
+      const option = document.createElement("option");
+      option.value = value;
+      option.textContent = label;
+      platformSelect.appendChild(option);
+    });
+    platformSelect.value = identityPlatforms.some((item) => item[0] === platform) ? platform : "other";
+    platformWrap.append(platformLabel, platformSelect);
+
+    const urlWrap = document.createElement("div");
+    const urlLabel = document.createElement("label");
+    urlLabel.className = "field-label";
+    urlLabel.textContent = "URL HTTPS";
+    const urlId = "identity-url-" + identityLinkSequence;
+    urlLabel.htmlFor = urlId;
+    const urlInput = document.createElement("input");
+    urlInput.className = "field-control identity-url";
+    urlInput.id = urlId;
+    urlInput.type = "url";
+    urlInput.inputMode = "url";
+    urlInput.autocomplete = "url";
+    urlInput.placeholder = "https://…";
+    urlInput.maxLength = 2048;
+    urlInput.value = typeof url === "string" ? url : "";
+    urlInput.setAttribute("aria-label", "Adresse HTTPS du lien " + identityPlatformLabel(platformSelect.value));
+    urlWrap.append(urlLabel, urlInput);
+
+    const remove = document.createElement("button");
+    remove.className = "identity-link-remove";
+    remove.type = "button";
+    remove.textContent = "Supprimer";
+    remove.setAttribute("aria-label", "Supprimer ce lien social");
+    remove.addEventListener("click", () => { row.remove(); identityUpdatePreview(); });
+    platformSelect.addEventListener("change", () => {
+      urlInput.setAttribute("aria-label", "Adresse HTTPS du lien " + identityPlatformLabel(platformSelect.value));
+      identityUpdatePreview();
+    });
+    urlInput.addEventListener("input", identityUpdatePreview);
+    row.append(platformWrap, urlWrap, remove);
+    identityLinks.appendChild(row);
+  };
+  const identityUpdatePreview = () => {
+    if (!identityLinks || !identityName || !identityPreview) return;
+    const data = identityCurrentData();
+    const validLinks = data.links.filter((item) => identityValidUrl(item.url));
+    if (identityBioCount) identityBioCount.textContent = data.bio.length + " / 500 caractères";
+    if (identityLinkCount) identityLinkCount.textContent = data.links.length + " lien" + (data.links.length === 1 ? "" : "s");
+    const setText = (id, value, fallback) => {
+      const element = document.getElementById(id);
+      if (element) element.textContent = value || fallback;
+    };
+    setText("identity-preview-name", data.name, "Ton nom de créateur");
+    setText("identity-preview-handle", data.handle ? "@" + data.handle : "", " @tonpseudo");
+    setText("identity-preview-tagline", data.tagline, "Ta phrase courte apparaîtra ici.");
+    setText("identity-preview-bio", data.bio, "Ta présentation apparaîtra ici.");
+    setText("identity-preview-avatar", (data.name || "N").trim().charAt(0).toLocaleUpperCase(), "N");
+    const linksContainer = document.getElementById("identity-preview-links");
+    if (!linksContainer) return;
+    linksContainer.replaceChildren();
+    if (!validLinks.length) {
+      const empty = document.createElement("p");
+      empty.className = "identity-empty";
+      empty.textContent = data.links.length ? "Aucun lien HTTPS valide pour le moment." : "Tes liens valides apparaîtront ici.";
+      linksContainer.appendChild(empty);
+      return;
+    }
+    validLinks.forEach((item) => {
+      const link = document.createElement("a");
+      link.className = "identity-preview-link";
+      link.href = item.url;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.textContent = identityPlatformLabel(item.platform) + " ↗";
+      linksContainer.appendChild(link);
+    });
+  };
+  const identityValidate = (data) => {
+    if (!data.name) return "Ajoute un nom affiché avant d'enregistrer.";
+    if (data.handle && !/^[A-Za-z0-9._-]{1,30}$/.test(data.handle)) return "Le nom d'utilisateur contient des caractères non autorisés.";
+    if (data.links.length > 20) return "Tu peux ajouter au maximum 20 liens.";
+    for (let i = 0; i < data.links.length; i += 1) {
+      if (!identityPlatforms.some((item) => item[0] === data.links[i].platform)) return "Une plateforme sélectionnée n'est pas reconnue.";
+      if (!identityValidUrl(data.links[i].url)) return "Le lien " + (i + 1) + " doit être une adresse HTTPS valide.";
+    }
+    return "";
+  };
+  const identityFillForm = (data) => {
+    identityName.value = data.name || "";
+    identityHandle.value = data.handle || "";
+    identityTagline.value = data.tagline || "";
+    identityBio.value = data.bio || "";
+    identityLinks.replaceChildren();
+    (Array.isArray(data.links) ? data.links : []).slice(0, 20).forEach((item) => identityCreateLinkRow(item.platform, item.url));
+    identityUpdatePreview();
+  };
+  const identityDownloadJson = (data) => {
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = "nexora-digital-identity.json";
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+  };
+  const identityCopyText = async (value) => {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(value);
+      return;
+    }
+    const field = document.createElement("textarea");
+    field.value = value;
+    field.setAttribute("readonly", "");
+    field.style.position = "absolute";
+    field.style.left = "-9999px";
+    document.body.appendChild(field);
+    field.select();
+    const copied = document.execCommand("copy");
+    field.remove();
+    if (!copied) throw new Error("Copy not available");
+  };
+
+  if (identityForm && identityName && identityHandle && identityTagline && identityBio && identityLinks) {
+    [identityName, identityHandle, identityTagline, identityBio].forEach((field) => field.addEventListener("input", identityUpdatePreview));
+    identityHandle.addEventListener("input", () => {
+      identityHandle.value = identityHandle.value.replace(/^@+/, "");
+    });
+    if (identityAddLink) identityAddLink.addEventListener("click", () => {
+      if (identityLinks.querySelectorAll(".identity-link-row").length >= 20) {
+        identitySetFeedback("La fiche peut contenir au maximum 20 liens.", true);
+        return;
+      }
+      identityCreateLinkRow("instagram", "");
+      identityUpdatePreview();
+    });
+    identityForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const data = identityCurrentData();
+      const validationError = identityValidate(data);
+      if (validationError) { identitySetFeedback(validationError, true); return; }
+      try {
+        localStorage.setItem(identityStorageKey, JSON.stringify(data));
+        identitySetFeedback("Fiche enregistrée dans le stockage local de cet appareil.", false);
+      } catch (_) {
+        identitySetFeedback("Impossible d'enregistrer : le stockage local est indisponible ou plein. Essaie d'exporter la fiche en JSON.", true);
+      }
+    });
+    if (identityExport) identityExport.addEventListener("click", () => {
+      const data = identityCurrentData();
+      const validationError = identityValidate(data);
+      if (validationError) { identitySetFeedback(validationError, true); return; }
+      identityDownloadJson(data);
+      identitySetFeedback("Export JSON préparé. Conserve ce fichier dans un endroit sûr.", false);
+    });
+    if (identityCopy) identityCopy.addEventListener("click", async () => {
+      const data = identityCurrentData();
+      const validationError = identityValidate(data);
+      if (validationError) { identitySetFeedback(validationError, true); return; }
+      const lines = [data.name, data.handle ? "@" + data.handle : "", data.tagline, data.bio, ...data.links.map((item) => identityPlatformLabel(item.platform) + ": " + item.url)].filter(Boolean);
+      try {
+        await identityCopyText(lines.join("\n"));
+        identitySetFeedback("Résumé copié. Tu peux le coller où tu veux.", false);
+      } catch (_) {
+        identitySetFeedback("La copie automatique a échoué. Réessaie ou exporte la fiche en JSON.", true);
+      }
+    });
+    if (identityImport && identityImportFile) {
+      identityImport.addEventListener("click", () => identityImportFile.click());
+      identityImportFile.addEventListener("change", async () => {
+        const file = identityImportFile.files && identityImportFile.files[0];
+        identityImportFile.value = "";
+        if (!file) return;
+        if (file.size > 1024 * 1024) { identitySetFeedback("Le fichier JSON dépasse la limite de 1 Mo.", true); return; }
+        try {
+          const imported = JSON.parse(await file.text());
+          if (!imported || typeof imported !== "object" || Array.isArray(imported) ||
+              typeof imported.name !== "string" || typeof imported.handle !== "string" ||
+              typeof imported.tagline !== "string" || typeof imported.bio !== "string" ||
+              !Array.isArray(imported.links) || imported.links.length > 20 ||
+              imported.name.length > 60 || imported.handle.length > 30 ||
+              imported.tagline.length > 100 || imported.bio.length > 500 ||
+              imported.links.some((item) => !item || typeof item.platform !== "string" || typeof item.url !== "string" || item.url.length > 2048)) {
+            throw new Error("Invalid profile structure");
+          }
+          const data = { version: 1, name: imported.name, handle: imported.handle, tagline: imported.tagline, bio: imported.bio, links: imported.links };
+          const validationError = identityValidate(data);
+          if (validationError) { identitySetFeedback("Import refusé : " + validationError, true); return; }
+          identityFillForm(data);
+          identitySetFeedback("Fiche importée dans l'éditeur. Enregistre-la pour la conserver sur cet appareil.", false);
+        } catch (_) {
+          identitySetFeedback("Import impossible : fichier JSON invalide ou format non pris en charge.", true);
+        }
+      });
+    }
+    if (identityReset) identityReset.addEventListener("click", () => {
+      if (!window.confirm("Effacer la fiche enregistrée sur cet appareil et vider l'éditeur ? Pense à exporter une sauvegarde si tu souhaites la garder.")) return;
+      try { localStorage.removeItem(identityStorageKey); } catch (_) {}
+      identityFillForm({ name: "", handle: "", tagline: "", bio: "", links: [] });
+      identitySetFeedback("La fiche locale a été effacée.", false);
+    });
+    try {
+      const saved = localStorage.getItem(identityStorageKey);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed && typeof parsed.name === "string" && typeof parsed.handle === "string" &&
+            typeof parsed.tagline === "string" && typeof parsed.bio === "string" && Array.isArray(parsed.links)) {
+          identityFillForm({
+            name: parsed.name.slice(0, 60), handle: parsed.handle.slice(0, 30),
+            tagline: parsed.tagline.slice(0, 100), bio: parsed.bio.slice(0, 500),
+            links: parsed.links.filter((item) => item && typeof item.platform === "string" && typeof item.url === "string").slice(0, 20)
+          });
+          identitySetFeedback("Fiche locale chargée.", false);
+        }
+      }
+    } catch (_) {
+      identitySetFeedback("Le navigateur n'a pas pu lire la fiche enregistrée. Tu peux importer une sauvegarde JSON.", true);
+    }
+    identityUpdatePreview();
+  }
+
   window.addEventListener("popstate", () => {
     const requestedView = window.location.hash.slice(1);
     showView(pageTitles[requestedView] ? requestedView : "overview", {
