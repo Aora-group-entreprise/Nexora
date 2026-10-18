@@ -95,7 +95,7 @@ def main():
     if missing_content_controls:
         errors.append("Content Intelligence control(s) missing: " + ", ".join(missing_content_controls))
     required_bridge_controls = {
-        "bridge-tone", "bridge-text", "bridge-count", "bridge-rewrite-button",
+        "bridge-tone", "bridge-source-language", "bridge-text", "bridge-count", "bridge-rewrite-button",
         "bridge-result", "bridge-copy-button", "bridge-phrase", "bridge-language",
         "bridge-phrase-button", "bridge-phrase-result",
     }
