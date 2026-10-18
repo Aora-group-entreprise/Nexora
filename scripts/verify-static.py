@@ -130,6 +130,16 @@ def main():
         for feature in ("imageAnalysisId", "videoAnalysisId", "WORD_PATTERN", "function analyzeText"):
             if feature not in js_text:
                 errors.append("Content Intelligence safety/compatibility feature missing: " + feature)
+        for feature in (
+            "Conseils pour améliorer le visuel",
+            "Vérification visuelle à faire",
+            "Pour une miniature YouTube",
+            "Conseils pour améliorer la vidéo",
+            "Contrôle le début de la vidéo",
+            "ne regarde ni n'écoute",
+        ):
+            if feature not in js_text:
+                errors.append("Image/video improvement advice missing: " + feature)
         if "/[\\\\p{L}\\\\p{N}]+/gu" in js_text:
             errors.append("Unicode property escape literal may break older browsers")
         for feature in ("const phrasebook", "bridge-rewrite-button", "bridge-copy-button", "bridge-phrase-button"):
