@@ -48,6 +48,8 @@ async function main() {
     assert.match(textAnalysis, /Hashtags/);
     assert.match(textAnalysis, /Mots uniques/);
     assert.match(textAnalysis, /Conseils adaptés/);
+    assert.match(textAnalysis, /Comment améliorer ce contenu/);
+    assert.match(textAnalysis, /Exemple d'accroche|information concrète|question précise/i);
     assert.match(textAnalysis, /Conseil général/);
     await page.locator("#content-platform").selectOption("instagram-post");
     const instagramAnalysis = await page.locator("#text-result").innerText();
@@ -57,6 +59,7 @@ async function main() {
     const focusedAnalysis = await page.locator("#text-result").innerText();
     assert.match(focusedAnalysis, /Émojis détectés/);
     assert.match(focusedAnalysis, /hashtag est répété/i);
+    assert.match(focusedAnalysis, /Comment améliorer ce contenu/);
     await page.locator("#image-file").setInputFiles({
       name: "not-an-image.txt", mimeType: "text/plain", buffer: Buffer.from("test")
     });
