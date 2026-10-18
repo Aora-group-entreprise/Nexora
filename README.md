@@ -24,13 +24,31 @@ Aider les créateurs à améliorer leurs contenus, adapter leurs messages à dif
 
 Certaines fonctions avancées, comme une traduction IA fiable ou des pages de profil publiques persistantes, pourront demander une architecture ou un service supplémentaire. Elles ne seront pas promises avant d'avoir évalué leurs coûts et leurs contraintes.
 
+## Structure actuelle
+
+Le dépôt contient le squelette statique initial :
+- `index.html` — structure de la page d'accueil et des quatre vues de navigation ;
+- `styles.css` — styles responsive ;
+- `app.js` — navigation côté navigateur, gestion du menu mobile et navigation avec l'historique ;
+- `favicon.svg` — icône du site ;
+- `scripts/verify-static.py` — vérifications statiques sans dépendances.
+
+Les trois modules sont encore des écrans d'introduction. Leurs fonctions métier seront implémentées et testées dans les étapes suivantes.
+
+## Vérifications
+
+Lancer le contrôle statique local depuis la racine du dépôt :
+
+```bash
+python scripts/verify-static.py
+node --check app.js
+```
+
+Le workflow GitHub Actions `.github/workflows/static-checks.yml` exécute les contrôles prévus lors des événements configurés. Les vérifications de structure ne remplacent pas encore des tests de navigateur réels.
+
 ## Plan de construction
 
-Lire [docs/PRODUCT_PLAN.md](docs/PRODUCT_PLAN.md) pour le positionnement, le périmètre du MVP, les phases de développement et les critères d'acceptation. Les tests de fumée locaux sans dépendances peuvent être lancés avec `python scripts/verify-static.py` ; la syntaxe JavaScript est vérifiée avec `node --check app.js`.
-
-## État du projet
-
-Le squelette statique initial est en place : interface responsive, navigation entre les vues, icône, styles et tests de fumée sans dépendances. Les trois vues de modules indiquent clairement qu'elles sont encore en construction ; elles ne prétendent pas fournir déjà les analyses, traductions ou pages publiques finales. Les fonctions métier seront implémentées et testées progressivement.
+Lire [docs/PRODUCT_PLAN.md](docs/PRODUCT_PLAN.md) pour le positionnement, le périmètre du MVP, les phases de développement et les critères d'acceptation.
 
 ## Hébergement envisagé
 
