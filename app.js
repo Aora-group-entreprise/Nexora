@@ -428,7 +428,7 @@
     bridgeRewriteButton.addEventListener("click", () => {
       const language = bridgeSourceLanguage ? bridgeSourceLanguage.value : "fr";
       const raw = normalizeBridgeText(bridgeText.value).replace(/\r\n?/g, "\n");
-      const original = raw.split("\n").map((line) => line.replace(/[\t ]+/g, " ").replace(/[ \t]+([,;:!?])/g, "$1").replace(/([,;:!?])(?=\S)/g, "$1 ")).join("\n").replace(/\n{3,}/g, "\n\n").trim();
+      const original = raw.split("\n").map((line) => line.replace(/[\t ]+/g, " ").replace(/[ \t]+([,;:!?])/g, "$1").replace(/([,;:!?])(?=[^\s,;:!?])/g, "$1 ")).join("\n").replace(/\n{3,}/g, "\n\n").trim();
       if (!original) {
         bridgeResult.dataset.result = "";
         bridgeResult.dataset.advice = "";
