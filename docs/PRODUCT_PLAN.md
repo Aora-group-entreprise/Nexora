@@ -94,10 +94,16 @@ Limite technique : une application purement statique ne fournit pas à elle seul
 - [ ] faire relire les traductions du phrasebook par des locuteurs compétents avant lancement public.
 
 ### Phase 4 — Digital Identity
-- éditeur local de fiche ;
-- gestion et validation des liens ;
-- prévisualisation, export et partage par les moyens pris en charge ;
-- décision documentée pour de futures pages publiques persistantes.
+- [x] éditeur local de fiche : nom, pseudo, phrase courte et présentation ;
+- [x] ajouter et supprimer jusqu'à 20 liens sociaux ou de site web ;
+- [x] validation des URL HTTPS et refus des URL invalides/non sécurisées ;
+- [x] prévisualisation en direct avec liens ouvrant un nouvel onglet de façon sécurisée ;
+- [x] sauvegarde et chargement depuis le stockage local du navigateur ;
+- [x] export JSON, import JSON avec contrôle de structure et copie du résumé ;
+- [x] effacement local avec confirmation ;
+- [x] interface responsive et états de validation/erreur ;
+- [ ] tester manuellement le parcours complet dans de vrais navigateurs et sur plusieurs tailles d'écran ;
+- [ ] décider séparément d'une architecture si des pages publiques persistantes partageables deviennent nécessaires.
 
 ### Phase 5 — Qualité et déploiement
 - tests fonctionnels et responsive ;
