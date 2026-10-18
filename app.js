@@ -286,7 +286,7 @@
 
   if (bridgeRewriteButton && bridgeText && bridgeResult && bridgeTone && bridgeCopyButton) {
     bridgeRewriteButton.addEventListener("click", () => {
-      const original = bridgeText.value.trim().replace(/[ \\t]+/g, " ").replace(/\\s*([,;:!?])\\s*/g, "$1 ").replace(/\\s+([.])/g, "$1").trim();
+      const original = bridgeText.value.trim().replace(/[ \t]+/g, " ").replace(/\s*([,;:!?])\s*/g, "$1 ").replace(/\s+([.])/g, "$1").trim();
       if (!original) {
         bridgeResult.dataset.result = "";
         bridgeResult.innerHTML = '<p class="result-error">Écris ou colle un texte avant de continuer.</p>';
@@ -309,7 +309,7 @@
         if (!/[.!?…]$/.test(result)) result += ".";
       }
       bridgeResult.dataset.result = result;
-      bridgeResult.innerHTML = "<h3>Proposition locale</h3><p>" + escapeHtml(result).replace(/\\n/g, "<br>") + "</p><p class=\"field-help\">Suggestion fondée sur des règles de mise en forme ; le sens et l'adaptation culturelle doivent être vérifiés par toi.</p>";
+      bridgeResult.innerHTML = "<h3>Proposition locale</h3><p>" + escapeHtml(result).replace(/\n/g, "<br>") + "</p><p class=\"field-help\">Suggestion fondée sur des règles de mise en forme ; le sens et l'adaptation culturelle doivent être vérifiés par toi.</p>";
       bridgeCopyButton.disabled = false;
     });
     bridgeCopyButton.addEventListener("click", async () => {
