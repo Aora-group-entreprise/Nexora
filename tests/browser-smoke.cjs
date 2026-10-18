@@ -82,6 +82,30 @@ async function main() {
     });
     assert.match(await page.locator("#video-result").innerText(), /pas reconnu comme une vidéo/);
 
+    // Exercise video advice deterministically without depending on a real codec.
+    await page.evaluate(() => {
+      HTMLMediaElement.prototype.load = function () {};
+      Object.defineProperty(HTMLVideoElement.prototype, "videoWidth", { configurable: true, get: () => 1080 });
+      Object.defineProperty(HTMLVideoElement.prototype, "videoHeight", { configurable: true, get: () => 1920 });
+      Object.defineProperty(HTMLVideoElement.prototype, "duration", { configurable: true, get: () => 12 });
+    });
+    await page.locator("#content-platform").selectOption("tiktok");
+    await page.locator("#video-file").setInputFiles({
+      name: "sample.webm", mimeType: "video/webm", buffer: Buffer.from("synthetic test fixture")
+    });
+    await page.evaluate(() => {
+      const video = document.querySelector("video");
+      if (!video) throw new Error("Video metadata element was not created");
+      video.dispatchEvent(new Event("loadedmetadata"));
+    });
+    const videoAnalysis = await page.locator("#video-result").innerText();
+    assert.match(videoAnalysis, /Analyse technique de la vidéo/);
+    assert.match(videoAnalysis, /1080 × 1920 px/);
+    assert.match(videoAnalysis, /Durée/);
+    assert.match(videoAnalysis, /Conseils pour améliorer la vidéo/);
+    assert.match(videoAnalysis, /vidéo verticale/i);
+    assert.match(videoAnalysis, /ne regarde ni n'écoute/i);
+
     // Cultural Bridge local rewrite and phrasebook.
     await page.locator('[data-view="cultural"]').first().click();
     await page.locator("#bridge-text").fill("bonjour à tous");
