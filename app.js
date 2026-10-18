@@ -426,7 +426,8 @@
       platformSelect.appendChild(option);
     });
     platformSelect.value = identityPlatforms.some((item) => item[0] === platform) ? platform : "other";
-    platformWrap.appendChild(platformLabel);\n    platformWrap.appendChild(platformSelect);
+    platformWrap.appendChild(platformLabel);
+    platformWrap.appendChild(platformSelect);
 
     const urlWrap = document.createElement("div");
     const urlLabel = document.createElement("label");
@@ -444,7 +445,8 @@
     urlInput.maxLength = 2048;
     urlInput.value = typeof url === "string" ? url : "";
     urlInput.setAttribute("aria-label", "Adresse HTTPS du lien " + identityPlatformLabel(platformSelect.value));
-    urlWrap.appendChild(urlLabel);\n    urlWrap.appendChild(urlInput);
+    urlWrap.appendChild(urlLabel);
+    urlWrap.appendChild(urlInput);
 
     const remove = document.createElement("button");
     remove.className = "identity-link-remove";
@@ -457,7 +459,9 @@
       identityUpdatePreview();
     });
     urlInput.addEventListener("input", identityUpdatePreview);
-    row.appendChild(platformWrap);\n    row.appendChild(urlWrap);\n    row.appendChild(remove);
+    row.appendChild(platformWrap);
+    row.appendChild(urlWrap);
+    row.appendChild(remove);
     identityLinks.appendChild(row);
   };
   const identityUpdatePreview = () => {
@@ -594,7 +598,8 @@
         if (!file) return;
         if (file.size > 1024 * 1024) { identitySetFeedback("Le fichier JSON dépasse la limite de 1 Mo.", true); return; }
         try {
-          const rawJson = typeof file.text === "function" ? await file.text() : await new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(String(reader.result || "")); reader.onerror = () => reject(new Error("File read failed")); reader.readAsText(file); });\n          const imported = JSON.parse(rawJson);
+          const rawJson = typeof file.text === "function" ? await file.text() : await new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(String(reader.result || "")); reader.onerror = () => reject(new Error("File read failed")); reader.readAsText(file); });
+          const imported = JSON.parse(rawJson);
           if (!imported || typeof imported !== "object" || Array.isArray(imported) ||
               typeof imported.name !== "string" || typeof imported.handle !== "string" ||
               typeof imported.tagline !== "string" || typeof imported.bio !== "string" ||
