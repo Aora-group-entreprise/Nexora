@@ -5,6 +5,7 @@
   const viewControls = Array.from(document.querySelectorAll("[data-view]"));
   const sidebar = document.getElementById("sidebar");
   const menuButton = document.getElementById("mobile-menu-button");
+  const menuOverlay = document.getElementById("sidebar-overlay");
   const breadcrumb = document.getElementById("breadcrumb-current");
   const year = document.getElementById("current-year");
 
@@ -20,6 +21,7 @@
     sidebar.classList.remove("is-open");
     menuButton.setAttribute("aria-expanded", "false");
     menuButton.setAttribute("aria-label", "Ouvrir le menu");
+    if (menuOverlay) menuOverlay.hidden = true;
   }
 
   function showView(viewName, options = {}) {
@@ -75,10 +77,15 @@
       const isOpen = sidebar.classList.toggle("is-open");
       menuButton.setAttribute("aria-expanded", String(isOpen));
       menuButton.setAttribute("aria-label", isOpen ? "Fermer le menu" : "Ouvrir le menu");
+      if (menuOverlay) menuOverlay.hidden = !isOpen;
     });
 
+    if (menuOverlay) {
+      menuOverlay.addEventListener("click", closeMobileMenu);
+    }
+
     document.addEventListener("click", (event) => {
-      if (window.matchMedia("(max-width: 900px)").matches &&
+      if (window.matchMedia("(max-width: 760px)").matches &&
           sidebar.classList.contains("is-open") &&
           !sidebar.contains(event.target) &&
           !menuButton.contains(event.target)) {
@@ -87,7 +94,14 @@
     });
 
     document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape") closeMobileMenu();
+      if (event.key === "Escape" && sidebar.classList.contains("is-open")) {
+        closeMobileMenu();
+        menuButton.focus();
+      }
+    });
+
+    window.addEventListener("resize", () => {
+      if (!window.matchMedia("(max-width: 760px)").matches) closeMobileMenu();
     });
   }
 
