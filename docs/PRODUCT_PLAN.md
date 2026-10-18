@@ -86,7 +86,7 @@ Limite technique : une application purement statique ne fournit pas à elle seul
 
 ### Phase 3 — Cultural Bridge
 - [x] interface de reformulation et de résultat ;
-- [x] normalisation locale du texte et styles simples (clair, amical, professionnel, engageant) ;
+- [x] normalisation locale du texte et modèles de ton simples (clair, amical, professionnel, engageant), adaptés au français, à l'anglais ou au malagasy ;
 - [x] mini phrasebook de 10 expressions prédéfinies en français, anglais et malagasy ;
 - [x] copie du résultat avec solution de repli pour les navigateurs plus anciens ;
 - [x] limites clairement annoncées : pas de traduction libre ni de prétendue IA ;
