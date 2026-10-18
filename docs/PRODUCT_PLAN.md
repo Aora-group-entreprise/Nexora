@@ -109,7 +109,9 @@ Limite technique : une application purement statique ne fournit pas à elle seul
 - [x] vérification automatisée de la syntaxe JavaScript et des éléments statiques dans GitHub Actions ;
 - [x] contrôles de régression pour la navigation avec l'historique, les liens externes sécurisés et les limites de la fiche Digital Identity ;
 - [x] correction de la validation des longueurs de profil et du message affiché si l'effacement du stockage local échoue ;
-- [ ] tests fonctionnels manuels dans un navigateur réel ;
+- [x] ajout de tests de fumée Playwright couvrant navigation, analyse de texte, refus de fichiers invalides, Cultural Bridge, sauvegarde/chargement Digital Identity et menu mobile ;
+- [ ] confirmer le résultat du workflow navigateur après son exécution ;
+- [ ] tests fonctionnels manuels sur de vrais navigateurs et appareils ;
 - [ ] contrôle de la console et des erreurs dans un navigateur ;
 - [ ] vérification responsive sur téléphone, tablette et ordinateur ;
 - [ ] vérification de confidentialité des fichiers et du chargement sur connexion lente ;
