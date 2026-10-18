@@ -210,28 +210,86 @@
   function analyzeText() {
     if (!textInput || !textResult) return;
     const value = textInput.value.trim();
-    if (!value) { textResult.dataset.analyzed = "false"; showError(textResult, "Saisis un texte avant de lancer l'analyse."); return; }
+    if (!value) {
+      textResult.dataset.analyzed = "false";
+      showError(textResult, "Saisis un texte avant de lancer l'analyse.");
+      return;
+    }
+
     const words = getWords(value);
     const hashtags = value.match(HASHTAG_PATTERN) || [];
     const mentions = value.match(MENTION_PATTERN) || [];
-    const sentences = value.split(/[.!?…]+/).map((s) => s.trim()).filter(Boolean);
-    const stop = new Set(["avec","dans","pour","mais","donc","alors","cette","cela","vous","nous","votre","the","and","for","that","this","with","from","have","your"]);
+    const sentences = value.split(/[.!?…]+/).map((sentence) => sentence.trim()).filter(Boolean);
+    const lines = value.split(/\\r?\\n/).map((line) => line.trim()).filter(Boolean);
+    const lowerWords = words.map((word) => word.toLocaleLowerCase());
+    const stop = new Set([
+      "avec","dans","pour","mais","donc","alors","cette","cela","vous","nous","votre","plus","tout","tous","comme","sur","une","des","les","est","qui","que","aux","par",
+      "the","and","for","that","this","with","from","have","your","you","are","was","will","our","not","but","can","all","get","just","more","what","when",
+      "ny","amin","izao","izany","ary","dia","tsy","aho","ianao","isika","izy","izy ireo","ho","ao","amin'ny","efa","koa","mba","raha","fa","ny"
+    ]);
     const counts = new Map();
-    words.forEach((word) => { const key = word.toLocaleLowerCase(); if (key.length > 3 && !stop.has(key)) counts.set(key,(counts.get(key)||0)+1); });
-    const repeated = Array.from(counts.entries()).filter((entry)=>entry[1]>=3).sort((a,b)=>b[1]-a[1]).slice(0,5);
+    lowerWords.forEach((word) => {
+      if (word.length > 3 && !stop.has(word)) counts.set(word, (counts.get(word) || 0) + 1);
+    });
+    const repeated = Array.from(counts.entries())
+      .filter((entry) => entry[1] >= 3)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5);
+    const uniqueWords = new Set(lowerWords);
+    const averageSentenceLength = sentences.length ? words.length / sentences.length : words.length;
+    const firstLine = lines[0] || value;
+    const firstLineWords = getWords(firstLine);
+    const questionCount = (value.match(/\\?/g) || []).length;
+    const exclamationCount = (value.match(/!/g) || []).length;
+    const emojiCount = (value.match(/[\\u{1F300}-\\u{1FAFF}\\u{2600}-\\u{27BF}]/gu) || []).length;
+    const hasCallToAction = /\\b(comment|commente|partage|enregistre|sauvegarde|abonne|abonne-toi|suis-moi|clique|découvre|dis-moi|donne|réponds|follow|share|save|subscribe|comment below|tell me|check out|let me know|zarao|araho|lazao|valio|soraty)\\b/i.test(value);
+    const hasOpeningHook = /^(pourquoi|comment|voici|découvre|imagine|et si|tu savais|saviez-vous|le secret|3 |5 |7 |why|how|here('s| is)|discover|imagine|did you know|the secret|3 |5 |7 |fantatrao ve|ahoana|jereo|indro)\\b/i.test(firstLine);
+    const platform = platformSelect ? platformSelect.value : "general";
     const advice = [];
-    if (value.length > 2200) advice.push("Le texte est long ("+value.length+" caractères) ; vérifie la limite de la plateforme choisie.");
-    if (words.length < 5) advice.push("Le texte est très court ; ajoute du contexte si ton public en a besoin.");
-    if (sentences.some((sentence) => getWords(sentence).length > 30)) advice.push("Au moins une phrase est longue ; essaie de la raccourcir.");
-    if (repeated.length) advice.push("Mots répétés : "+repeated.map((entry)=>entry[0]+" ("+entry[1]+" fois)").join(", ")+".");
-    if (hashtags.length > 10) advice.push("Le texte contient "+hashtags.length+" hashtags ; garde ceux qui sont pertinents.");
-    if (value.length > 500 && sentences.length < 2) advice.push("Pense à séparer le texte en phrases ou paragraphes plus courts.");
+
+    if (value.length > 2200) advice.push("Le texte dépasse 2 200 caractères. Vérifie la limite actuelle de la plateforme et le format choisi avant de publier.");
+    if (words.length < 5) advice.push("Le texte est très court. Si ton public ne connaît pas encore le sujet, ajoute une information qui lui donne du contexte.");
+    if (averageSentenceLength > 24) advice.push("Les phrases sont longues en moyenne (" + averageSentenceLength.toFixed(1) + " mots). Essaie de couper une idée en deux pour faciliter la lecture sur téléphone.");
+    if (sentences.some((sentence) => getWords(sentence).length > 32)) advice.push("Au moins une phrase dépasse 32 mots. Raccourcis-la ou sépare-la en deux phrases.");
+    if (repeated.length) advice.push("Certains mots reviennent souvent : " + repeated.map((entry) => entry[0] + " (" + entry[1] + " fois)").join(", ") + ". Vérifie si cette répétition est voulue.");
+    if (hashtags.length > 10) advice.push("Tu utilises " + hashtags.length + " hashtags. Garde surtout ceux qui décrivent précisément le contenu ; plus de hashtags ne garantit pas plus de portée.");
+    if (hashtags.length > 0) {
+      const uniqueHashtags = new Set(hashtags.map((tag) => tag.toLocaleLowerCase()));
+      if (uniqueHashtags.size < hashtags.length) advice.push("Au moins un hashtag est répété. Supprime les doublons pour garder une liste plus nette.");
+      if (hashtags.some((tag) => tag.length > 30)) advice.push("Un hashtag est très long. Vérifie qu'il est facile à lire et qu'il correspond à une recherche réelle.");
+    }
+    if (mentions.length > 5) advice.push("Le texte contient " + mentions.length + " mentions. Vérifie que chaque compte cité est utile et que tu ne mentionnes pas des personnes inutilement.");
+    if (value.length > 500 && sentences.length < 2) advice.push("Le texte est long mais contient peu de séparations de phrases. Ajoute de la ponctuation ou des paragraphes pour le rendre plus facile à parcourir.");
+    if (lines.length === 1 && value.length > 240) advice.push("Sur mobile, un seul grand bloc peut être difficile à parcourir. Essaie de regrouper les idées en petits paragraphes.");
+    if (firstLineWords.length > 0 && firstLineWords.length > 18) advice.push("La première ligne est assez longue (" + firstLineWords.length + " mots). Raccourcis-la pour faire ressortir plus vite l'idée principale.");
+    if (!hasOpeningHook && words.length >= 12) advice.push("La première ligne présente peut-être le sujet sans accroche claire. Essaie une question, un bénéfice concret ou une idée surprenante, sans exagérer la promesse.");
+    if (words.length >= 15 && !hasCallToAction && !/[?？]$/.test(value)) advice.push("Aucun appel à l'action évident n'a été détecté. Si c'est utile pour ton objectif, invite le public à répondre, enregistrer ou partager — sans forcer.");
+    if (questionCount > 3) advice.push("Il y a " + questionCount + " questions. Garde celles qui aident vraiment le lecteur à réfléchir ou à répondre.");
+    if (exclamationCount > 5) advice.push("Le texte contient beaucoup de points d'exclamation. Réduis-les si tu veux un ton plus posé.");
+    if (emojiCount > 8) advice.push("Le texte contient beaucoup d'émojis (" + emojiCount + "). Vérifie qu'ils renforcent le message sans le rendre difficile à lire.");
+
+    const platformAdvice = {
+      "instagram-post": "Instagram : fais apparaître l'idée principale dès les premières lignes ; vérifie l'aperçu mobile et la pertinence des hashtags.",
+      "instagram-reel": "Instagram Reels : la légende accompagne la vidéo ; vérifie aussi que le message essentiel est compréhensible sans dépendre uniquement de la légende.",
+      tiktok: "TikTok : garde une légende concise et cohérente avec ce que l'on voit ou entend dans la vidéo. Les tendances ne garantissent pas les résultats.",
+      youtube: "YouTube : place le sujet et les mots importants naturellement au début de la description ; évite les répétitions artificielles de mots-clés.",
+      "youtube-thumb": "YouTube miniature : l'analyse du texte ne vérifie pas la miniature elle-même. Pour le titre associé, privilégie une promesse précise et fidèle à la vidéo.",
+      general: "Conseil général : vérifie que le texte est compréhensible sans contexte, que les faits sont exacts et que le ton convient à ton public."
+    };
+    advice.push(platformAdvice[platform] || platformAdvice.general);
+
+    if (advice.length === 1) advice.unshift("Aucun problème de structure évident n'a été repéré par les règles de base. Cela ne garantit ni la qualité éditoriale ni les performances du post.");
     textResult.dataset.analyzed = "true";
-    textResult.innerHTML = "<h3>Résultat de l'analyse</h3>" + renderMetrics([
-      {label:"Caractères",value:String(value.length)},{label:"Mots",value:String(words.length)},
-      {label:"Hashtags",value:String(hashtags.length)},{label:"Mentions",value:String(mentions.length)},
-      {label:"Phrases détectées",value:String(sentences.length)},{label:"Mots moyens par phrase",value:sentences.length?(words.length/sentences.length).toFixed(1):"0"}
-    ]) + renderAdvice(advice);
+    textResult.innerHTML = "<h3>Analyse du texte</h3>" + renderMetrics([
+      {label:"Caractères",value:String(value.length)},
+      {label:"Mots",value:String(words.length)},
+      {label:"Mots uniques",value:String(uniqueWords.size)},
+      {label:"Hashtags",value:String(hashtags.length)},
+      {label:"Mentions",value:String(mentions.length)},
+      {label:"Phrases détectées",value:String(sentences.length)},
+      {label:"Mots moyens / phrase",value:sentences.length ? averageSentenceLength.toFixed(1) : "0"},
+      {label:"Émojis détectés",value:String(emojiCount)}
+    ]) + "<h3>Conseils adaptés</h3><ul>" + advice.map((item) => "<li>" + escapeHtml(item) + "</li>").join("") + "</ul><p class=\"field-help\">Analyse locale fondée sur des règles et des mots-clés : elle peut manquer le contexte, l'ironie ou la langue exacte. Elle ne prédit pas la viralité et n'envoie pas ton texte à un serveur.</p>";
   }
   if (imageInput) imageInput.addEventListener("change", () => analyzeImage(imageInput.files && imageInput.files[0]));
   if (videoInput) videoInput.addEventListener("change", () => analyzeVideo(videoInput.files && videoInput.files[0]));
