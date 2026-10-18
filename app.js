@@ -174,8 +174,23 @@
         if (width < target.width || height < target.height) advice.push("La résolution est inférieure au repère cible de " + target.width + " × " + target.height + " px. Si possible, exporte une version plus grande pour limiter le flou.");
       }
       if (ratio > 2.2 || ratio < .45) advice.push("Le format est très panoramique ou très étroit. Vérifie que le sujet reste visible dans l'aperçu mobile et que le recadrage ne coupe rien d'important.");
-      advice.push("Vérification visuelle à faire : le sujet doit être immédiatement identifiable, le contraste suffisant et tout texte intégré à l'image lisible sur un petit écran.");
-      advice.push("Si l'image transmet une information importante, ajoute aussi une description accessible dans la publication. Cette analyse mesure les propriétés du fichier ; elle ne comprend pas la scène représentée.");
+      if (target) {
+        const targetRatio = target.width / target.height;
+        if (Math.abs(ratio - targetRatio) / targetRatio <= .05) {
+          advice.push("Le ratio est proche du format de référence choisi. Vérifie tout de même l'aperçu réel de la plateforme : ses boutons et légendes peuvent recouvrir les bords.");
+        }
+        if (platformSelect && platformSelect.value === "youtube-thumb") {
+          advice.push("Pour une miniature YouTube, teste-la aussi en petit format : garde un sujet principal net et peu de mots, assez grands pour être lus sur téléphone.");
+        } else if (platformSelect && platformSelect.value === "instagram-post") {
+          advice.push("Pour une publication Instagram, vérifie la grille et l'aperçu du fil : le sujet et les éventuels mots importants doivent rester visibles après recadrage.");
+        } else if (platformSelect && ["instagram-reel", "tiktok"].includes(platformSelect.value)) {
+          advice.push("Pour un visuel vertical, garde le sujet et les textes importants au centre : les commandes et légendes de l'application peuvent masquer les zones proches des bords.");
+        }
+      }
+      if (/image\\/(jpeg|jpg)/i.test(file.type)) advice.push("JPEG convient souvent aux photos. Si l'image contient du texte fin, des contours nets ou de la transparence, compare le rendu avec un format mieux adapté avant l'export.");
+      if (/image\\/(png|webp|avif)/i.test(file.type)) advice.push("Vérifie que le format et la compression préservent les détails et, si nécessaire, la transparence. Le format déclaré ne suffit pas à juger la qualité visuelle.");
+      advice.push("Vérification visuelle à faire : le sujet doit être immédiatement identifiable, le contraste suffisant et tout texte intégré à l'image lisible sur un petit écran. Réduis les éléments décoratifs si le message principal se perd.");
+      advice.push("Si l'image transmet une information importante, ajoute une description accessible à la publication. Cette analyse mesure les propriétés du fichier ; elle ne comprend pas la scène représentée.");
       imageResult.innerHTML = "<h3>Analyse technique de l'image</h3>" + renderMetrics([
         {label:"Dimensions",value:width+" × "+height+" px"},{label:"Poids",value:formatBytes(file.size)},
         {label:"Format",value:file.type||"Non précisé"},{label:"Ratio",value:ratio.toFixed(2)+":1"},
@@ -207,8 +222,16 @@
       if (duration > 60) advice.push("La vidéo dure plus d'une minute. Vérifie que l'idée principale arrive tôt et que chaque séquence apporte quelque chose ; la durée idéale dépend de la plateforme et du sujet.");
       if (duration > 0 && duration < 5) advice.push("La vidéo est très courte. Vérifie que le contexte et le message restent compréhensibles, même sans explication supplémentaire.");
       if (file.size > 8 * 1024 * 1024) advice.push("Le fichier dépasse 8 Mo. Une exportation plus légère peut accélérer l'envoi, à condition de préserver une qualité acceptable.");
+      if (target) {
+        if (platformSelect && ["instagram-reel", "tiktok"].includes(platformSelect.value)) {
+          advice.push("Pour une vidéo verticale, garde le visage, l'action et les textes importants dans la zone centrale : les boutons, la description et les sous-titres de la plateforme peuvent couvrir les bords.");
+        } else if (platformSelect && platformSelect.value === "youtube") {
+          advice.push("Pour une vidéo YouTube classique, vérifie le cadrage en 16:9 et que le sujet reste compréhensible sur un écran plus petit. Le format seul ne garantit pas une bonne expérience.");
+        }
+      }
+      if (Number.isFinite(duration) && duration >= 5 && duration <= 60) advice.push("La durée se situe entre 5 et 60 secondes. Vérifie que chaque séquence fait avancer le message et retire les temps morts, sans accélérer au point de nuire à la compréhension.");
       advice.push("Contrôle le début de la vidéo : le sujet ou le bénéfice doit être clair rapidement, sans promettre plus que ce que le contenu montre.");
-      advice.push("Vérifie manuellement le son, les sous-titres, la lisibilité du texte à l'écran et le rythme des coupes. Ces éléments ne peuvent pas être évalués à partir des seules métadonnées.");
+      advice.push("Vérifie manuellement le son, les sous-titres, la lisibilité du texte à l'écran et le rythme des coupes. Si le message doit être compris sans son, ajoute des sous-titres relus. Ces éléments ne peuvent pas être évalués à partir des seules métadonnées.");
       videoResult.innerHTML = "<h3>Analyse technique de la vidéo</h3>" + renderMetrics([
         {label:"Dimensions",value:width&&height?width+" × "+height+" px":"Indisponibles"},
         {label:"Durée",value:formatDuration(duration)},{label:"Poids",value:formatBytes(file.size)},{label:"Format déclaré",value:file.type||"Non précisé"}
