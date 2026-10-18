@@ -145,9 +145,50 @@
         </section>
 
         <section class="view module-view" id="view-cultural" data-page="cultural" aria-labelledby="cultural-title" hidden>
-          <div class="page-intro"><div class="eyebrow"><span class="eyebrow-line"></span> MODULE 02</div><h1 id="cultural-title">Cultural <span class="gradient-text">Bridge</span></h1><p>Prépare tes messages pour qu'ils soient compris au-delà des frontières linguistiques et culturelles.</p></div>
-          <div class="module-status-card"><div class="status-illustration status-purple" aria-hidden="true">◎</div><div><span class="status-label"><span class="status-dot"></span> PHASE DE CONSTRUCTION</span><h2>Les mots voyagent bientôt.</h2><p>Nous commencerons par des outils de reformulation et d'adaptation clairement délimités. Les traductions proposées seront identifiées selon les capacités réellement disponibles.</p><button class="button button-secondary" type="button" data-view="overview">Retour à la vue d'ensemble</button></div></div>
-          <div class="notice"><span aria-hidden="true">ⓘ</span><p>Une traduction automatique de qualité ne sera annoncée que lorsqu'une méthode adaptée sera intégrée et testée.</p></div>
+          <div class="page-intro"><div class="eyebrow"><span class="eyebrow-line"></span> MODULE 02</div><h1 id="cultural-title">Cultural <span class="gradient-text">Bridge</span></h1><p>Adapte tes messages à différents publics et retrouve des expressions courantes dans plusieurs langues.</p></div>
+          <div class="notice"><span aria-hidden="true">🔒</span><p><strong>Traitement local :</strong> tes textes restent dans ce navigateur. La reformulation utilise des règles simples, pas une IA, et ne traduit pas automatiquement un texte libre.</p></div>
+          <div class="cultural-grid">
+            <article class="tool-card">
+              <div class="tool-card-heading"><div class="module-symbol symbol-purple" aria-hidden="true">✎</div><div><h2>Reformulation locale</h2><p>Améliore la présentation sans changer volontairement la langue du texte.</p></div></div>
+              <label class="field-label" for="bridge-tone">Ton souhaité</label>
+              <select class="field-control cultural-control" id="bridge-tone">
+                <option value="clear">Clair et direct</option>
+                <option value="friendly">Amical et chaleureux</option>
+                <option value="professional">Professionnel</option>
+                <option value="engaging">Engageant pour les réseaux sociaux</option>
+              </select>
+              <label class="field-label cultural-label" for="bridge-text">Ton message</label>
+              <textarea class="field-control text-area" id="bridge-text" maxlength="5000" placeholder="Colle ou écris ton message ici…" aria-describedby="bridge-count"></textarea>
+              <div class="text-tool-footer"><span id="bridge-count">0 caractère · 0 mot</span><button class="button button-primary" id="bridge-rewrite-button" type="button">Reformuler</button></div>
+              <div class="analysis-result" id="bridge-result" aria-live="polite"></div>
+              <button class="button button-secondary cultural-copy" id="bridge-copy-button" type="button" disabled>Copier le résultat</button>
+            </article>
+            <article class="tool-card">
+              <div class="tool-card-heading"><div class="module-symbol symbol-blue" aria-hidden="true">文</div><div><h2>Mini phrasebook</h2><p>Expressions prédéfinies vérifiées manuellement pour les cas courants.</p></div></div>
+              <label class="field-label" for="bridge-phrase">Choisis une expression</label>
+              <select class="field-control cultural-control" id="bridge-phrase">
+                <option value="hello">Bonjour !</option>
+                <option value="thanks">Merci beaucoup.</option>
+                <option value="welcome">Bienvenue !</option>
+                <option value="follow">Suis-moi pour plus de contenu.</option>
+                <option value="newpost">Une nouvelle publication est disponible.</option>
+                <option value="comment">Dis-moi ce que tu en penses en commentaire.</option>
+                <option value="share">Partage ce message avec tes amis.</option>
+                <option value="support">Merci pour ton soutien.</option>
+                <option value="comingsoon">Bientôt disponible.</option>
+                <option value="contact">Contacte-moi pour en savoir plus.</option>
+              </select>
+              <label class="field-label cultural-label" for="bridge-language">Langue de sortie</label>
+              <select class="field-control cultural-control" id="bridge-language">
+                <option value="mg">Malagasy</option>
+                <option value="en">English</option>
+                <option value="fr">Français</option>
+              </select>
+              <button class="button button-primary cultural-phrase-button" id="bridge-phrase-button" type="button">Afficher l'expression</button>
+              <div class="analysis-result" id="bridge-phrase-result" aria-live="polite">Choisis une expression et une langue, puis affiche le résultat.</div>
+              <p class="field-help">Ce mini dictionnaire ne traduit que les expressions proposées. Il ne s'agit pas d'un traducteur universel ; vérifie les formulations importantes avec un locuteur compétent.</p>
+            </article>
+          </div>
         </section>
 
         <section class="view module-view" id="view-identity" data-page="identity" aria-labelledby="identity-title" hidden>
