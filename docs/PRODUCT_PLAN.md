@@ -124,6 +124,16 @@ Limite technique : une application purement statique ne fournit pas à elle seul
 - améliorer les fonctions les plus utiles ;
 - n'étudier publicité, produits numériques ou fonctions payantes qu'après validation du besoin et des conditions applicables.
 
+### Phase 7 — Préparation du déploiement Cloudflare Pages
+- [x] documenter la configuration statique sans framework ni dépendance de build ;
+- [x] préparer les en-têtes HTTP de sécurité dans `_headers` ;
+- [x] ajouter une vérification automatisée de la configuration de déploiement ;
+- [ ] confirmer le workflow CI mis à jour ;
+- [ ] configurer le projet Cloudflare Pages depuis le tableau de bord ;
+- [ ] tester l'URL publique sur ordinateur et téléphone avant de déclarer le lancement prêt.
+
+Détails pratiques : [guide de déploiement](DEPLOYMENT.md). L'étape de publication réelle nécessite l'accès au compte Cloudflare du propriétaire ; elle n'est pas considérée comme faite tant que l'URL publiée n'a pas été vérifiée.
+
 ## 5. Critères d'acceptation du MVP
 
 - Les trois modules sont accessibles depuis une interface cohérente.
