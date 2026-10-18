@@ -475,7 +475,7 @@
       if (element) element.textContent = value || fallback;
     };
     setText("identity-preview-name", data.name, "Ton nom de créateur");
-    setText("identity-preview-handle", data.handle ? "@" + data.handle : "", " @tonpseudo");
+    setText("identity-preview-handle", data.handle ? "@" + data.handle : "", "Ton pseudo n’est pas renseigné.");
     setText("identity-preview-tagline", data.tagline, "Ta phrase courte apparaîtra ici.");
     setText("identity-preview-bio", data.bio, "Ta présentation apparaîtra ici.");
     setText("identity-preview-avatar", (data.name || "N").trim().charAt(0).toLocaleUpperCase(), "N");
