@@ -372,6 +372,7 @@
   const identityCopy = document.getElementById("identity-copy");
   const identityReset = document.getElementById("identity-reset");
   const identityStorageKey = "nexora.digitalIdentity.v1";
+  const identityClearChildren = (element) => { while (element && element.firstChild) element.removeChild(element.firstChild); };
   const identityPlatforms = [
     ["instagram", "Instagram"], ["tiktok", "TikTok"], ["youtube", "YouTube"],
     ["facebook", "Facebook"], ["x", "X"], ["twitch", "Twitch"],
@@ -425,7 +426,7 @@
       platformSelect.appendChild(option);
     });
     platformSelect.value = identityPlatforms.some((item) => item[0] === platform) ? platform : "other";
-    platformWrap.append(platformLabel, platformSelect);
+    platformWrap.appendChild(platformLabel);\n    platformWrap.appendChild(platformSelect);
 
     const urlWrap = document.createElement("div");
     const urlLabel = document.createElement("label");
@@ -443,7 +444,7 @@
     urlInput.maxLength = 2048;
     urlInput.value = typeof url === "string" ? url : "";
     urlInput.setAttribute("aria-label", "Adresse HTTPS du lien " + identityPlatformLabel(platformSelect.value));
-    urlWrap.append(urlLabel, urlInput);
+    urlWrap.appendChild(urlLabel);\n    urlWrap.appendChild(urlInput);
 
     const remove = document.createElement("button");
     remove.className = "identity-link-remove";
@@ -456,7 +457,7 @@
       identityUpdatePreview();
     });
     urlInput.addEventListener("input", identityUpdatePreview);
-    row.append(platformWrap, urlWrap, remove);
+    row.appendChild(platformWrap);\n    row.appendChild(urlWrap);\n    row.appendChild(remove);
     identityLinks.appendChild(row);
   };
   const identityUpdatePreview = () => {
@@ -476,7 +477,7 @@
     setText("identity-preview-avatar", (data.name || "N").trim().charAt(0).toLocaleUpperCase(), "N");
     const linksContainer = document.getElementById("identity-preview-links");
     if (!linksContainer) return;
-    linksContainer.replaceChildren();
+    identityClearChildren(linksContainer);
     if (!validLinks.length) {
       const empty = document.createElement("p");
       empty.className = "identity-empty";
@@ -509,7 +510,7 @@
     identityHandle.value = data.handle || "";
     identityTagline.value = data.tagline || "";
     identityBio.value = data.bio || "";
-    identityLinks.replaceChildren();
+    identityClearChildren(identityLinks);
     (Array.isArray(data.links) ? data.links : []).slice(0, 20).forEach((item) => identityCreateLinkRow(item.platform, item.url));
     identityUpdatePreview();
   };
@@ -593,7 +594,7 @@
         if (!file) return;
         if (file.size > 1024 * 1024) { identitySetFeedback("Le fichier JSON dépasse la limite de 1 Mo.", true); return; }
         try {
-          const imported = JSON.parse(await file.text());
+          const rawJson = typeof file.text === "function" ? await file.text() : await new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(String(reader.result || "")); reader.onerror = () => reject(new Error("File read failed")); reader.readAsText(file); });\n          const imported = JSON.parse(rawJson);
           if (!imported || typeof imported !== "object" || Array.isArray(imported) ||
               typeof imported.name !== "string" || typeof imported.handle !== "string" ||
               typeof imported.tagline !== "string" || typeof imported.bio !== "string" ||
