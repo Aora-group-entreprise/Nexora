@@ -106,12 +106,15 @@ Limite technique : une application purement statique ne fournit pas à elle seul
 - [ ] décider séparément d'une architecture si des pages publiques persistantes partageables deviennent nécessaires.
 
 ### Phase 5 — Qualité et déploiement
-- tests fonctionnels et responsive ;
-- contrôle de la console et des erreurs ;
-- vérification de confidentialité des fichiers ;
-- vérification du chargement sur connexion lente ;
-- configuration de Cloudflare Pages ;
-- test du déploiement publié.
+- [x] vérification automatisée de la syntaxe JavaScript et des éléments statiques dans GitHub Actions ;
+- [x] contrôles de régression pour la navigation avec l'historique, les liens externes sécurisés et les limites de la fiche Digital Identity ;
+- [x] correction de la validation des longueurs de profil et du message affiché si l'effacement du stockage local échoue ;
+- [ ] tests fonctionnels manuels dans un navigateur réel ;
+- [ ] contrôle de la console et des erreurs dans un navigateur ;
+- [ ] vérification responsive sur téléphone, tablette et ordinateur ;
+- [ ] vérification de confidentialité des fichiers et du chargement sur connexion lente ;
+- [ ] configuration de Cloudflare Pages ;
+- [ ] test du déploiement publié.
 
 ### Phase 6 — Validation et monétisation
 - obtenir des retours d'utilisateurs réels ;
